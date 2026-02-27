@@ -1,0 +1,143 @@
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800;900&display=swap');
+
+/* Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design System Variables - EAFIT */
+:root {
+  /* Colores Principales */
+  --color-primary: #000066;
+  --color-primary-rgb: 0, 0, 102;
+  --color-primary-light: #00A9E0;
+
+  /* Colores Web */
+  --color-bg-light: #fff;
+  --color-text-dark: #1D1D1D;
+  --color-blue-neon: #146AEF;
+
+  /* Estados */
+  --color-success: #0FAB0B;
+  --color-error: #A6040E;
+  --color-warning: #FFB900;
+  --color-info: #184958;
+
+  /* Escala de Grises */
+  --gray-20: #DDDDDD;
+  --gray-40: #BBBBBB;
+  --gray-60: #9B9B9B;
+  --gray-80: #656565;
+
+  /* Espaciado */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* Tipografía */
+  --font-primary: 'Inter', sans-serif;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;
+  --font-size-2xl: 27px;
+  --font-size-3xl: 30px;
+  --font-size-4xl: 42px;
+
+  /* Sombras */
+  --shadow-sm: 0 0 9px rgba(136, 138, 151, 0.16);
+  --shadow-md: 2px 2px 12px 1px rgba(136, 138, 151, 0.24);
+
+  /* Border Radius */
+  --radius-sm: 5px;
+  --radius-md: 8px;
+
+  /* Transiciones */
+  --transition-fast: 150ms ease-out;
+  --transition-base: 300ms ease-in-out;
+}
+
+/* Global styles */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  color: var(--color-text-dark);
+  background-color: var(--color-bg-light);
+}
+
+/* Utility Classes */
+.logo-size {
+  width: 232px;
+  height: 93px;
+}
+
+.primary-background {
+  background-color: #030213;
+}
+
+.secondary-background {
+  background-color: #333;
+}
+
+.white-color {
+  color: #fff;
+}
+
+.h-20 {
+  height: 20%;
+}
+
+.h-100 {
+  height: 100%;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-40);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-60);
+}
+
+/* Toast SweetAlert2 Custom Styles */
+.no-border {
+  border: none;
+}
+
+.toast-title {
+  font-size: 20px !important;
+  font-weight: bold !important;
+  margin-bottom: 0% !important;
+  margin-top: 0% !important;
+  font-family: 'Inter', sans-serif !important;
+  color: #171717;
+}
+
+.swal2-toast .swal2-html-container {
+  color: #4b4b4b !important;
+}
+
+.swal2-popup .swal2-html-container {
+  color: #4b4b4b !important;
+}

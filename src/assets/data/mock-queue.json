@@ -1,0 +1,28 @@
+{
+  "queue": [
+    {
+      "id": "q1",
+      "userId": "user-1",
+      "position": 1,
+      "joinedAt": "2024-02-24T14:00:00Z",
+      "estimatedWaitMinutes": 5,
+      "status": "WAITING"
+    },
+    {
+      "id": "q2",
+      "userId": "user-2",
+      "position": 2,
+      "joinedAt": "2024-02-24T14:05:00Z",
+      "estimatedWaitMinutes": 10,
+      "status": "WAITING"
+    },
+    {
+      "id": "q3",
+      "userId": "user-3",
+      "position": 3,
+      "joinedAt": "2024-02-24T14:10:00Z",
+      "estimatedWaitMinutes": 15,
+      "status": "WAITING"
+    }
+  ]
+}

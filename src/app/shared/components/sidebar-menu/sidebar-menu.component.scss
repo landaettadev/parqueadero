@@ -1,0 +1,9 @@
+aside {
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  aside {
+    width: 100%;
+  }
+}

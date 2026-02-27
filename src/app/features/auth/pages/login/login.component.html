@@ -1,0 +1,78 @@
+<div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #000066 0%, #00A9E0 100%); padding: 24px;">
+  <div style="width: 100%; max-width: 480px;">
+    <!-- Login Card -->
+    <div style="background: white; border-radius: 24px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); padding: 48px 40px;">
+      
+      <!-- Logo centrado -->
+      <div style="text-align: center; margin-bottom: 32px;">
+        <img src="logo.png" alt="Smart Parking EAFIT" style="height: 120px; width: auto; margin: 0 auto 24px; display: block;" />
+        <h1 style="font-size: 32px; font-weight: 700; color: #000066; margin: 0 0 12px 0; letter-spacing: -0.5px;">Smart Parking EAFIT</h1>
+        <p style="color: #666; margin: 0; font-size: 16px; font-weight: 400;">Sistema de Gestion de Parqueadero</p>
+      </div>
+
+      <!-- Separador -->
+      <div style="height: 1px; background: linear-gradient(to right, transparent, #e0e0e0, transparent); margin: 32px 0;"></div>
+
+      <h2 style="font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 32px; text-align: center;">
+        Iniciar Sesion
+      </h2>
+
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Email -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px;">
+            Correo Electronico
+          </label>
+          <input
+            type="email"
+            formControlName="email"
+            style="width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 15px; box-sizing: border-box;"
+            placeholder="usuario@eafit.edu.co" />
+        </div>
+
+        <!-- Password -->
+        <div style="margin-bottom: 32px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px;">
+            Contrasena
+          </label>
+          <input
+            type="password"
+            formControlName="password"
+            style="width: 100%; padding: 14px 16px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 15px; box-sizing: border-box;"
+            placeholder="********" />
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          [disabled]="isLoading()"
+          style="background: linear-gradient(135deg, #000066 0%, #000088 100%); color: white; width: 100%; padding: 16px; border-radius: 12px; font-weight: 600; border: none; cursor: pointer; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,102,0.3);">
+          @if (isLoading()) {
+            Iniciando sesion...
+          } @else {
+            Iniciar Sesion
+          }
+        </button>
+      </form>
+
+      <!-- Demo Credentials -->
+      <div style="margin-top: 32px; padding: 20px; background: linear-gradient(135deg, #f0f7ff 0%, #e6f2ff 100%); border-radius: 12px; border-left: 4px solid #000066;">
+        <p style="font-size: 13px; color: #000066; font-weight: 700; margin: 0 0 12px 0; text-transform: uppercase;">Credenciales de Prueba</p>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <p style="font-size: 13px; color: #333; margin: 0; padding: 8px 12px; background: white; border-radius: 6px;">
+            <strong style="color: #000066;">Usuario:</strong> user@eafit.edu.co / 123456
+          </p>
+          <p style="font-size: 13px; color: #333; margin: 0; padding: 8px 12px; background: white; border-radius: 6px;">
+            <strong style="color: #000066;">Admin:</strong> admin@eafit.edu.co / 123456
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <p style="text-align: center; color: rgba(255,255,255,0.9); font-size: 14px; margin-top: 32px; font-weight: 500;">
+       {{ currentYear }} Universidad EAFIT
+    </p>
+  </div>
+</div>
