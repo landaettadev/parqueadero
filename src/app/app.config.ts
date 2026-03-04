@@ -9,11 +9,13 @@ import { routes } from './app.routes';
 import { ParkingRepository } from '@domain/repositories/parking.repository';
 import { QueueRepository } from '@domain/repositories/queue.repository';
 import { AuthRepository } from '@domain/repositories/auth.repository';
+import { AnalyticsRepository } from '@domain/repositories/analytics.repository';
 
 // Firebase Adapters
 import { FirebaseParkingAdapter } from '@infrastructure/adapters/firebase/firebase-parking.adapter';
 import { FirebaseQueueAdapter } from '@infrastructure/adapters/firebase/firebase-queue.adapter';
 import { FirebaseAuthAdapter } from '@infrastructure/adapters/firebase/firebase-auth.adapter';
+import { MockAnalyticsAdapter } from '@infrastructure/adapters/firebase/mock-analytics.adapter';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,6 +27,7 @@ export const appConfig: ApplicationConfig = {
     // Dependency Injection - Clean Architecture
     { provide: ParkingRepository, useClass: FirebaseParkingAdapter },
     { provide: QueueRepository, useClass: FirebaseQueueAdapter },
-    { provide: AuthRepository, useClass: FirebaseAuthAdapter }
+    { provide: AuthRepository, useClass: FirebaseAuthAdapter },
+    { provide: AnalyticsRepository, useClass: MockAnalyticsAdapter }
   ]
 };

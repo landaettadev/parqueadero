@@ -1,143 +1,354 @@
-<div class="page">
-  <h1 class="page-title">Reservas</h1>
-  <p class="page-subtitle">Reserva tu espacio con anticipacion</p>
+﻿<div class="page">
 
-  <!-- Active Reservation -->
+  <!-- Toast de exito -->
+  @if (showSuccess()) {
+    <div style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 100; background: #1a1a2e; color: white; padding: 14px 24px; border-radius: 14px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); animation: fadeIn 0.3s ease; white-space: nowrap;">
+      <span class="mi" style="color: #10b981; font-size: 20px;">check_circle</span>
+      {{ successMsg() }}
+    </div>
+  }
+
+  <!-- Header -->
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+    <h1 class="page-title" style="margin: 0;">Reservas</h1>
+    <button (click)="openCreateForm()" class="btn btn-primary btn-sm">
+      <span class="mi" style="font-size: 18px;">add</span>
+      Nueva
+    </button>
+  </div>
+  <p class="page-subtitle">Gestiona tus reservas de parqueo</p>
+
+  <!-- Reserva activa destacada -->
   @if (activeReservation(); as res) {
-    <div class="card gradient-primary" style="margin-bottom: 20px; padding: 24px;">
-      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-        <span style="font-size: 13px; font-weight: 600; opacity: 0.8;">RESERVA ACTIVA</span>
-        <span class="badge" style="background: rgba(255,255,255,0.2); color: white;">{{ getStatusLabel(res.status) }}</span>
+    <div class="card gradient-primary" style="margin-bottom: 20px; padding: 20px;">
+      <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 14px;">
+        <div style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; animation: pulse 1.5s infinite;"></div>
+        <span style="font-size: 12px; font-weight: 700; opacity: 0.9; letter-spacing: 1px;">RESERVA ACTIVA</span>
       </div>
       <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
-        <div style="width: 56px; height: 56px; border-radius: 14px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;">
+        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
           <span class="mi" style="font-size: 28px;">local_parking</span>
         </div>
         <div>
-          <div style="font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">{{ res.spotId }}</div>
+          <div style="font-size: 26px; font-weight: 900; letter-spacing: -1px;">{{ res.spotId || 'Asignando...' }}</div>
           <div style="font-size: 14px; opacity: 0.8;">{{ getZoneName(res.zoneId) }}</div>
         </div>
-      </div>
-      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
-        <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; text-align: center;">
-          <div style="font-size: 11px; opacity: 0.7;">Hora reservada</div>
-          <div style="font-size: 18px; font-weight: 700;">{{ formatTime(res.scheduledTime) }}</div>
-        </div>
-        <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; text-align: center;">
-          <div style="font-size: 11px; opacity: 0.7;">Expira</div>
-          <div style="font-size: 18px; font-weight: 700;">{{ formatTime(res.expiresAt) }}</div>
+        <div style="margin-left: auto;">
+          <span class="mi" style="font-size: 22px; color: {{ getVehicleIcon(res.vehicleId) }};">{{ getVehicleIcon(res.vehicleId) }}</span>
         </div>
       </div>
-      <button (click)="cancelReservation(res.id)"
-              style="width: 100%; padding: 14px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.3); background: transparent; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;">
-        Cancelar Reserva
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+        <div style="background: rgba(255,255,255,0.12); border-radius: 12px; padding: 12px;">
+          <div style="font-size: 10px; opacity: 0.7; margin-bottom: 2px;">PLACA</div>
+          <div style="font-size: 16px; font-weight: 700; letter-spacing: 1px;">{{ getVehiclePlate(res.vehicleId) }}</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.12); border-radius: 12px; padding: 12px;">
+          <div style="font-size: 10px; opacity: 0.7; margin-bottom: 2px;">HORA</div>
+          <div style="font-size: 16px; font-weight: 700;">{{ formatDateTime(res.scheduledTime) }}</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button (click)="openEditForm(res)" style="flex: 1; padding: 12px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.4); background: transparent; color: white; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span class="mi" style="font-size: 16px;">edit</span>Editar
+        </button>
+        <button (click)="confirmCancel(res.id)" style="flex: 1; padding: 12px; border-radius: 12px; border: 2px solid rgba(255,0,0,0.4); background: rgba(255,0,0,0.15); color: white; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span class="mi" style="font-size: 16px;">cancel</span>Cancelar
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Filtros -->
+  <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; scrollbar-width: none;">
+    @for (opt of filterOptions; track opt.value) {
+      <button (click)="filterStatus.set(opt.value)"
+              style="padding: 8px 16px; border-radius: 20px; border: 1.5px solid; cursor: pointer; font-size: 13px; font-weight: 600; white-space: nowrap; font-family: inherit; transition: all 0.2s; flex-shrink: 0;"
+              [style.borderColor]="filterStatus() === opt.value ? '#000066' : '#e5e7eb'"
+              [style.background]="filterStatus() === opt.value ? 'rgba(0,0,102,0.08)' : 'white'"
+              [style.color]="filterStatus() === opt.value ? '#000066' : '#6b7280'">
+        {{ opt.label }}
+      </button>
+    }
+  </div>
+
+  <!-- Lista de reservas -->
+  @if (filteredReservations().length === 0) {
+    <div class="card" style="text-align: center; padding: 48px 24px;">
+      <span class="mi" style="font-size: 56px; color: #d1d5db;">event_busy</span>
+      <p style="font-size: 15px; font-weight: 600; color: #374151; margin: 12px 0 4px;">Sin reservas</p>
+      <p style="font-size: 13px; color: #9ca3af; margin: 0 0 20px;">Crea tu primera reserva para apartar un espacio</p>
+      <button (click)="openCreateForm()" class="btn btn-primary">
+        <span class="mi" style="font-size: 18px;">add_circle</span>
+        Crear reserva
       </button>
     </div>
   }
 
-  <!-- New Reservation Button -->
-  @if (!activeReservation()) {
-    @if (!showNewForm()) {
-      <div (click)="showNewForm.set(true)" class="card" style="margin-bottom: 20px; cursor: pointer; display: flex; align-items: center; gap: 16px; border: 2px dashed #d1d5db;">
-        <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(0,0,102,0.08); display: flex; align-items: center; justify-content: center;">
-          <span class="mi" style="font-size: 26px; color: #000066;">add_circle</span>
+  @for (res of filteredReservations(); track res.id) {
+    <div class="card" style="margin-bottom: 12px; padding: 16px;">
+      <div style="display: flex; align-items: flex-start; gap: 14px;">
+        <!-- Icono de estado -->
+        <div style="width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+             [style.background]="res.status === 'CONFIRMED' ? 'rgba(59,130,246,0.1)' : res.status === 'ACTIVE' ? 'rgba(16,185,129,0.1)' : '#f3f4f6'">
+          <span class="mi" style="font-size: 24px;"
+                [style.color]="res.status === 'CONFIRMED' ? '#3b82f6' : res.status === 'ACTIVE' ? '#10b981' : '#9ca3af'">
+            {{ getStatusIcon(res.status) }}
+          </span>
         </div>
-        <div>
-          <div style="font-size: 16px; font-weight: 700; color: #000066;">Nueva Reserva</div>
-          <div style="font-size: 13px; color: #9ca3af;">Reserva un espacio hasta 30 min antes</div>
+
+        <div style="flex: 1; min-width: 0;">
+          <!-- Zona + Badge -->
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;">
+            <span style="font-size: 16px; font-weight: 700; color: #1a1a2e;">{{ getZoneName(res.zoneId) }}</span>
+            @if (res.spotId) {
+              <span style="font-size: 14px; font-weight: 700; color: #000066; background: rgba(0,0,102,0.08); padding: 2px 10px; border-radius: 8px;">{{ res.spotId }}</span>
+            }
+            <span class="badge" [class]="getStatusBadge(res.status)">{{ getStatusLabel(res.status) }}</span>
+          </div>
+
+          <!-- Info secundaria -->
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span class="mi" style="font-size: 14px; color: #9ca3af;">{{ getVehicleIcon(res.vehicleId) }}</span>
+              <span style="font-size: 13px; color: #6b7280; letter-spacing: 0.5px;">{{ getVehiclePlate(res.vehicleId) }}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span class="mi" style="font-size: 14px; color: #9ca3af;">schedule</span>
+              <span style="font-size: 13px; color: #6b7280;">{{ formatDateTime(res.scheduledTime) }}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span class="mi" style="font-size: 14px; color: #9ca3af;">timelapse</span>
+              <span style="font-size: 13px; color: #6b7280;">{{ formatDuration(res.scheduledTime, res.expiresAt) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acciones -->
+        <div style="display: flex; gap: 6px; flex-shrink: 0;">
+          @if (canEdit(res)) {
+            <button (click)="openEditForm(res)" style="width: 36px; height: 36px; border-radius: 10px; border: none; background: rgba(59,130,246,0.1); cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Editar">
+              <span class="mi" style="font-size: 18px; color: #3b82f6;">edit</span>
+            </button>
+          }
+          @if (canCancel(res)) {
+            <button (click)="confirmCancel(res.id)" style="width: 36px; height: 36px; border-radius: 10px; border: none; background: rgba(239,68,68,0.1); cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Cancelar">
+              <span class="mi" style="font-size: 18px; color: #ef4444;">cancel</span>
+            </button>
+          }
         </div>
       </div>
-    } @else {
-      <!-- New Reservation Form -->
-      <div class="card" style="margin-bottom: 20px; animation: fadeIn 0.3s ease;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-          <span style="font-size: 16px; font-weight: 700; color: #1a1a2e;">Nueva Reserva</span>
-          <button (click)="showNewForm.set(false)" style="border: none; background: none; cursor: pointer;">
-            <span class="mi" style="font-size: 22px; color: #9ca3af;">close</span>
-          </button>
-        </div>
+    </div>
+  }
+</div>
 
-        <!-- Zone Selection -->
-        <div style="margin-bottom: 16px;">
-          <div style="font-size: 13px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Zona</div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+<!-- ===== FORMULARIO MODAL (Crear / Editar) ===== -->
+@if (showForm()) {
+  <div style="position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,0.4); display: flex; align-items: flex-end; justify-content: center;" (click)="showForm.set(false)">
+    <div style="width: 100%; max-width: 600px; background: white; border-radius: 24px 24px 0 0; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease;" (click)="$event.stopPropagation()">
+
+      <!-- Handle -->
+      <div style="width: 40px; height: 4px; background: #d1d5db; border-radius: 2px; margin: 12px auto 0;"></div>
+
+      <!-- Form Header -->
+      <div style="padding: 20px 24px 0; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800; color: #1a1a2e; margin: 0;">
+            {{ formMode() === 'create' ? 'Nueva Reserva' : 'Editar Reserva' }}
+          </h2>
+          <p style="font-size: 13px; color: #9ca3af; margin: 4px 0 0;">Completa los datos del parqueo</p>
+        </div>
+        <button (click)="showForm.set(false)" style="width: 36px; height: 36px; border-radius: 10px; border: none; background: #f3f4f6; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+          <span class="mi" style="font-size: 20px; color: #6b7280;">close</span>
+        </button>
+      </div>
+
+      <div style="padding: 20px 24px 32px; display: flex; flex-direction: column; gap: 18px;">
+
+        <!-- Zona de parqueo -->
+        <div>
+          <label style="font-size: 13px; font-weight: 700; color: #374151; display: block; margin-bottom: 8px;">
+            <span class="mi" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">location_on</span>
+            Zona de Parqueo
+          </label>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
             @for (zone of zones(); track zone.id) {
-              <button (click)="selectedZone.set(zone.id)"
-                      style="flex: 1; min-width: 80px; padding: 14px 12px; border-radius: 12px; border: 2px solid; cursor: pointer; text-align: center; font-family: inherit; transition: all 0.2s;"
-                      [style.borderColor]="selectedZone() === zone.id ? '#000066' : '#e5e7eb'"
-                      [style.background]="selectedZone() === zone.id ? 'rgba(0,0,102,0.08)' : 'white'"
-                      [style.color]="selectedZone() === zone.id ? '#000066' : '#6b7280'">
-                <div style="font-size: 15px; font-weight: 700;">{{ zone.name }}</div>
-                <div style="font-size: 12px; margin-top: 2px;">{{ zone.availableSpots }} libres</div>
+              <label style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; border: 2px solid; cursor: pointer; transition: all 0.2s;"
+                     [style.borderColor]="form().zoneId === zone.id ? '#000066' : '#e5e7eb'"
+                     [style.background]="form().zoneId === zone.id ? 'rgba(0,0,102,0.06)' : 'white'">
+                <input type="radio" [value]="zone.id" [checked]="form().zoneId === zone.id"
+                       (change)="updateForm('zoneId', zone.id)"
+                       style="width: 18px; height: 18px; accent-color: #000066; flex-shrink: 0;" />
+                <div style="flex: 1;">
+                  <div style="font-size: 14px; font-weight: 700; color: #1a1a2e;">{{ zone.name }}</div>
+                  <div style="font-size: 12px; color: #9ca3af;">{{ zone.description }}</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 18px; font-weight: 800;"
+                       [style.color]="zone.availableSpots > 10 ? '#10b981' : zone.availableSpots > 3 ? '#f59e0b' : '#ef4444'">
+                    {{ zone.availableSpots }}
+                  </div>
+                  <div style="font-size: 10px; color: #9ca3af;">libres</div>
+                </div>
+              </label>
+            }
+          </div>
+        </div>
+
+        <!-- Vehiculo -->
+        <div>
+          <label style="font-size: 13px; font-weight: 700; color: #374151; display: block; margin-bottom: 8px;">
+            <span class="mi" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">directions_car</span>
+            Vehiculo
+          </label>
+          @if (vehicles().length === 0) {
+            <div style="padding: 14px 16px; border-radius: 14px; border: 2px solid #fef3c7; background: #fffbeb; display: flex; gap: 10px; align-items: center;">
+              <span class="mi" style="font-size: 20px; color: #f59e0b;">warning</span>
+              <span style="font-size: 13px; color: #92400e;">No tienes vehiculos registrados. Ve a <strong>Perfil</strong> para agregar uno.</span>
+            </div>
+          } @else {
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              @for (v of vehicles(); track v.id) {
+                <label style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; border: 2px solid; cursor: pointer; transition: all 0.2s;"
+                       [style.borderColor]="form().vehicleId === v.id ? '#000066' : '#e5e7eb'"
+                       [style.background]="form().vehicleId === v.id ? 'rgba(0,0,102,0.06)' : 'white'">
+                  <input type="radio" [value]="v.id" [checked]="form().vehicleId === v.id"
+                         (change)="updateForm('vehicleId', v.id)"
+                         style="width: 18px; height: 18px; accent-color: #000066; flex-shrink: 0;" />
+                  <span class="mi" style="font-size: 22px; color: #000066;">{{ getVehicleIcon(v.id) }}</span>
+                  <div>
+                    <div style="font-size: 14px; font-weight: 700; color: #1a1a2e; letter-spacing: 1px;">{{ v.plate }}</div>
+                    <div style="font-size: 12px; color: #9ca3af;">{{ v.brand }} {{ v.model }}</div>
+                  </div>
+                  @if (v.isDefault) {
+                    <span class="badge badge-success" style="margin-left: auto;">Principal</span>
+                  }
+                </label>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Fecha y hora -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label style="font-size: 13px; font-weight: 700; color: #374151; display: block; margin-bottom: 8px;">
+              <span class="mi" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">calendar_today</span>
+              Fecha
+            </label>
+            <input type="date" [value]="form().date" (change)="updateForm('date', $any($event.target).value)"
+                   [min]="getTodayDate()"
+                   style="width: 100%; padding: 14px 12px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-family: inherit; outline: none; box-sizing: border-box;" />
+          </div>
+          <div>
+            <label style="font-size: 13px; font-weight: 700; color: #374151; display: block; margin-bottom: 8px;">
+              <span class="mi" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">schedule</span>
+              Hora de llegada
+            </label>
+            <input type="time" [value]="form().time" (change)="updateForm('time', $any($event.target).value)"
+                   style="width: 100%; padding: 14px 12px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-family: inherit; outline: none; box-sizing: border-box;" />
+          </div>
+        </div>
+
+        <!-- Duracion -->
+        <div>
+          <label style="font-size: 13px; font-weight: 700; color: #374151; display: block; margin-bottom: 8px;">
+            <span class="mi" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">timelapse</span>
+            Duracion estimada
+          </label>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            @for (opt of durationOptions; track opt.value) {
+              <button (click)="updateForm('duration', opt.value)"
+                      style="padding: 10px 16px; border-radius: 10px; border: 2px solid; cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; transition: all 0.2s;"
+                      [style.borderColor]="form().duration === opt.value ? '#000066' : '#e5e7eb'"
+                      [style.background]="form().duration === opt.value ? 'rgba(0,0,102,0.08)' : 'white'"
+                      [style.color]="form().duration === opt.value ? '#000066' : '#6b7280'">
+                {{ opt.label }}
               </button>
             }
           </div>
         </div>
 
-        <!-- Time Selection -->
-        <div style="margin-bottom: 16px;">
-          <div style="font-size: 13px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Llego en</div>
+        <!-- Preferencia de espacio -->
+        <div>
+          <label style="font-size: 13px; font-weight: 700; color: #374151; display: block; margin-bottom: 8px;">
+            <span class="mi" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">tune</span>
+            Preferencia de espacio
+          </label>
           <div style="display: flex; gap: 8px;">
-            @for (min of [10, 20, 30]; track min) {
-              <button (click)="selectedMinutes.set(min)"
-                      style="flex: 1; padding: 14px; border-radius: 12px; border: 2px solid; cursor: pointer; text-align: center; font-family: inherit; transition: all 0.2s;"
-                      [style.borderColor]="selectedMinutes() === min ? '#000066' : '#e5e7eb'"
-                      [style.background]="selectedMinutes() === min ? 'rgba(0,0,102,0.08)' : 'white'"
-                      [style.color]="selectedMinutes() === min ? '#000066' : '#6b7280'">
-                <div style="font-size: 18px; font-weight: 700;">{{ min }}</div>
-                <div style="font-size: 11px;">minutos</div>
+            @for (pref of [{v:'any',l:'Cualquiera',i:'location_on'},{v:'covered',l:'Cubierto',i:'roofing'},{v:'accessible',l:'Accesible',i:'accessible'}]; track pref.v) {
+              <button (click)="updateForm('spotPreference', pref.v)"
+                      style="flex: 1; padding: 12px 8px; border-radius: 12px; border: 2px solid; cursor: pointer; text-align: center; font-family: inherit; transition: all 0.2s;"
+                      [style.borderColor]="form().spotPreference === pref.v ? '#000066' : '#e5e7eb'"
+                      [style.background]="form().spotPreference === pref.v ? 'rgba(0,0,102,0.08)' : 'white'"
+                      [style.color]="form().spotPreference === pref.v ? '#000066' : '#6b7280'">
+                <span class="mi" style="font-size: 20px; display: block; margin-bottom: 4px;">{{ pref.i }}</span>
+                <div style="font-size: 11px; font-weight: 600;">{{ pref.l }}</div>
               </button>
             }
           </div>
         </div>
 
-        <!-- Vehicle -->
-        @if (defaultVehicle(); as vehicle) {
-          <div style="margin-bottom: 16px; padding: 14px; background: #f9fafb; border-radius: 12px; display: flex; align-items: center; gap: 12px;">
-            <span class="mi" style="font-size: 22px; color: #000066;">{{ getVehicleIcon(vehicle.id) }}</span>
-            <div>
-              <div style="font-size: 14px; font-weight: 600;">{{ vehicle.plate }}</div>
-              <div style="font-size: 12px; color: #9ca3af;">{{ vehicle.brand }} {{ vehicle.model }}</div>
+        <!-- Notas -->
+        <div>
+          <label style="font-size: 13px; font-weight: 700; color: #374151; display: block; margin-bottom: 8px;">
+            <span class="mi" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">notes</span>
+            Notas (opcional)
+          </label>
+          <textarea [value]="form().notes" (input)="updateForm('notes', $any($event.target).value)"
+                    placeholder="Ej: Reunion importante, llego puntual..."
+                    rows="2"
+                    style="width: 100%; padding: 12px 14px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 14px; font-family: inherit; outline: none; resize: none; box-sizing: border-box;"></textarea>
+        </div>
+
+        <!-- Resumen antes de confirmar -->
+        @if (form().vehicleId && form().zoneId) {
+          <div style="padding: 16px; background: #f0f7ff; border-radius: 14px; border: 1px solid #bfdbfe;">
+            <div style="font-size: 13px; font-weight: 700; color: #1e40af; margin-bottom: 10px;">Resumen de la reserva</div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                <span style="color: #6b7280;">Zona</span>
+                <span style="font-weight: 600; color: #1a1a2e;">{{ getZoneName(form().zoneId) }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                <span style="color: #6b7280;">Placa</span>
+                <span style="font-weight: 600; color: #1a1a2e;">{{ getVehiclePlate(form().vehicleId) }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                <span style="color: #6b7280;">Fecha/Hora</span>
+                <span style="font-weight: 600; color: #1a1a2e;">{{ form().date }} {{ form().time }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                <span style="color: #6b7280;">Duracion</span>
+                <span style="font-weight: 600; color: #1a1a2e;">{{ form().duration }} min</span>
+              </div>
             </div>
           </div>
         }
 
-        <button (click)="createReservation()" class="btn btn-primary btn-block btn-lg">
-          <span class="mi" style="font-size: 20px;">event_available</span>
-          Confirmar Reserva
+        <!-- Submit -->
+        <button (click)="submitForm()" [disabled]="!form().vehicleId || !form().zoneId" class="btn btn-primary btn-block btn-lg">
+          <span class="mi" style="font-size: 20px;">{{ formMode() === 'create' ? 'event_available' : 'save' }}</span>
+          {{ formMode() === 'create' ? 'Confirmar Reserva' : 'Guardar Cambios' }}
         </button>
-      </div>
-    }
-  }
 
-  <!-- Reservation History -->
-  <h2 style="font-size: 18px; font-weight: 700; color: #1a1a2e; margin: 0 0 12px;">Historial de Reservas</h2>
-
-  @for (res of reservations(); track res.id) {
-    <div class="card" style="margin-bottom: 12px; display: flex; align-items: center; gap: 14px;">
-      <div style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;"
-           [style.background]="res.status === 'CONFIRMED' || res.status === 'ACTIVE' ? 'rgba(0,0,102,0.08)' : '#f3f4f6'">
-        <span class="mi" style="font-size: 24px;"
-              [style.color]="res.status === 'CONFIRMED' || res.status === 'ACTIVE' ? '#000066' : '#9ca3af'">
-          {{ res.status === 'CANCELLED' ? 'cancel' : res.status === 'EXPIRED' ? 'schedule' : 'local_parking' }}
-        </span>
-      </div>
-      <div style="flex: 1;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 15px; font-weight: 700; color: #1a1a2e;">{{ res.spotId || getZoneName(res.zoneId) }}</span>
-          <span class="badge" [class]="getStatusBadge(res.status)">{{ getStatusLabel(res.status) }}</span>
-        </div>
-        <div style="font-size: 12px; color: #9ca3af; margin-top: 2px;">
-          {{ getZoneName(res.zoneId) }} · {{ formatTime(res.scheduledTime) }}
-        </div>
       </div>
     </div>
-  }
+  </div>
+}
 
-  @if (reservations().length === 0) {
-    <div class="card" style="text-align: center; padding: 40px;">
-      <span class="mi" style="font-size: 48px; color: #d1d5db;">event_busy</span>
-      <p style="font-size: 14px; color: #9ca3af; margin: 8px 0 0;">No tienes reservas</p>
+<!-- Confirmacion de cancelacion -->
+@if (confirmCancelId()) {
+  <div style="position: fixed; inset: 0; z-index: 70; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; padding: 16px;" (click)="confirmCancelId.set(null)">
+    <div class="card" style="max-width: 360px; width: 100%; text-align: center; animation: fadeIn 0.2s ease; padding: 32px 24px;" (click)="$event.stopPropagation()">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: #fef2f2; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        <span class="mi" style="font-size: 32px; color: #ef4444;">cancel</span>
+      </div>
+      <h3 style="font-size: 18px; font-weight: 800; color: #1a1a2e; margin: 0 0 8px;">Cancelar reserva?</h3>
+      <p style="font-size: 14px; color: #6b7280; margin: 0 0 24px;">Esta accion no se puede deshacer. Tu espacio quedara disponible para otros usuarios.</p>
+      <div style="display: flex; gap: 12px;">
+        <button (click)="confirmCancelId.set(null)" class="btn btn-ghost" style="flex: 1;">Mantener</button>
+        <button (click)="doCancel()" class="btn btn-danger" style="flex: 1;">Si, cancelar</button>
+      </div>
     </div>
-  }
-</div>
+  </div>
+}

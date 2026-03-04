@@ -13,7 +13,7 @@ interface NavItem {
   selector: 'app-bottom-nav',
   imports: [CommonModule, RouterLink, RouterLinkActive],
   template: `
-    <nav style="position: fixed; bottom: 0; left: 0; right: 0; z-index: 40; background: white; box-shadow: 0 -2px 16px rgba(0,0,0,0.08); border-top: 1px solid #f3f4f6; padding: 6px 8px; padding-bottom: max(6px, env(safe-area-inset-bottom));">
+    <nav class="bottom-nav-bar">
       <div style="display: flex; align-items: center; justify-content: space-around; max-width: 500px; margin: 0 auto;">
         @for (item of navItems; track item.route) {
           <a [routerLink]="item.route" routerLinkActive="active-nav" [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
@@ -26,6 +26,16 @@ interface NavItem {
         }
       </div>
     </nav>
+    <style>
+      .bottom-nav-bar {
+        position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+        background: white; box-shadow: 0 -2px 16px rgba(0,0,0,0.08);
+        border-top: 1px solid #f3f4f6; padding: 6px 8px;
+        padding-bottom: max(6px, env(safe-area-inset-bottom));
+        display: block;
+      }
+      @media (min-width: 768px) { .bottom-nav-bar { display: none; } }
+    </style>
   `
 })
 export class BottomNavComponent {

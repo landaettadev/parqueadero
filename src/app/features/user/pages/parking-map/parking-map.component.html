@@ -1,98 +1,132 @@
-﻿<div class="page">
+﻿<div style="max-width: 1400px; margin: 0 auto; padding: 20px 16px 100px; animation: fadeIn 0.4s ease;">
+
   <h1 class="page-title">Mapa del Parqueadero</h1>
-  <p class="page-subtitle">Visualizacion en tiempo real</p>
+  <p class="page-subtitle">Selecciona una zona para ver detalles y reservar</p>
 
-  <!-- Map Image -->
-  <div class="card" style="margin-bottom: 20px; padding: 16px; overflow: hidden;">
-    <div style="border-radius: 12px; overflow: hidden; position: relative;">
-      <img src="mapa.png" alt="Mapa EAFIT" style="width: 100%; height: auto; display: block;" />
-    </div>
-  </div>
+  <!-- Desktop: 2 columnas | Mobile: apilado -->
+  <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
 
-  <!-- Legend -->
-  <div style="display: flex; gap: 16px; justify-content: center; margin-bottom: 20px;">
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <div style="width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></div>
-      <span style="font-size: 12px; color: #6b7280;">Disponible</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <div style="width: 10px; height: 10px; border-radius: 50%; background: #f59e0b;"></div>
-      <span style="font-size: 12px; color: #6b7280;">Limitado</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <div style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444;"></div>
-      <span style="font-size: 12px; color: #6b7280;">Lleno</span>
-    </div>
-  </div>
+    <!-- Contenedor principal -->
+    <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
 
-  <!-- Zones List -->
-  <h2 style="font-size: 18px; font-weight: 700; color: #1a1a2e; margin: 0 0 12px;">Zonas</h2>
+      <!-- MAP + ZONES en 2 columnas en desktop -->
+      <div class="map-layout">
 
-  @for (zone of zones(); track zone.id) {
-    <div class="card" style="margin-bottom: 12px; cursor: pointer;" (click)="selectZone(zone)">
-      <div style="display: flex; align-items: center; gap: 14px;">
-        <div style="width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-direction: column;"
-             [style.background]="getZoneColor(zone) + '18'">
-          <span style="font-size: 20px; font-weight: 800;" [style.color]="getZoneColor(zone)">{{ zone.availableSpots }}</span>
-          <span style="font-size: 9px; font-weight: 600;" [style.color]="getZoneColor(zone)">libres</span>
+        <!-- Imagen del mapa -->
+        <div class="card map-image-container" style="padding: 16px; overflow: hidden;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <span style="font-size: 15px; font-weight: 700; color: #1a1a2e;">Universidad EAFIT</span>
+            <!-- Legend inline -->
+            <div style="display: flex; gap: 12px;">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></div>
+                <span style="font-size: 11px; color: #6b7280;">Libre</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b;"></div>
+                <span style="font-size: 11px; color: #6b7280;">Limitado</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></div>
+                <span style="font-size: 11px; color: #6b7280;">Lleno</span>
+              </div>
+            </div>
+          </div>
+          <div style="border-radius: 12px; overflow: hidden; background: #f8fafc; max-height: 460px; display: flex; align-items: center; justify-content: center;">
+            <img src="mapa.png" alt="Mapa EAFIT"
+                 style="width: 100%; height: 100%; object-fit: contain; max-height: 460px; display: block;" />
+          </div>
         </div>
-        <div style="flex: 1;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 16px; font-weight: 700; color: #1a1a2e;">{{ zone.name }}</span>
-            <span class="badge"
-                  [class]="getZoneColor(zone) === '#0FAB0B' ? 'badge-success' : getZoneColor(zone) === '#FFB900' ? 'badge-warning' : 'badge-danger'">
-              {{ getZoneStatus(zone) === 'available' ? 'Disponible' : getZoneStatus(zone) === 'limited' ? 'Limitado' : 'Lleno' }}
-            </span>
-          </div>
-          <div style="font-size: 13px; color: #9ca3af; margin-top: 2px;">{{ zone.description || 'Zona de parqueo' }}</div>
-          <div class="progress-bar" style="margin-top: 10px;">
-            <div class="progress-fill" [style.width.%]="(zone.availableSpots / zone.totalSpots) * 100" [style.background]="getZoneColor(zone)"></div>
-          </div>
+
+        <!-- Zonas sidebar -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <h2 style="font-size: 16px; font-weight: 700; color: #1a1a2e; margin: 0;">Zonas disponibles</h2>
+
+          @for (zone of zones(); track zone.id) {
+            <div class="card" style="cursor: pointer; transition: box-shadow 0.2s, transform 0.15s; padding: 16px;"
+                 [style.border]="selectedZone()?.id === zone.id ? '2px solid #000066' : '2px solid transparent'"
+                 (click)="selectZone(zone)">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                <!-- Disponibilidad circular mini -->
+                <div style="position: relative; width: 52px; height: 52px; flex-shrink: 0;">
+                  <svg viewBox="0 0 36 36" style="width: 52px; height: 52px; transform: rotate(-90deg);">
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none" stroke="#e5e7eb" stroke-width="4" />
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none" [attr.stroke]="getZoneColor(zone)" stroke-width="4"
+                          [attr.stroke-dasharray]="((zone.availableSpots / zone.totalSpots) * 100) + ', 100'"
+                          stroke-linecap="round" />
+                  </svg>
+                  <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 11px; font-weight: 800;" [style.color]="getZoneColor(zone)">
+                      {{ Math.round((zone.availableSpots / zone.totalSpots) * 100) }}%
+                    </span>
+                  </div>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+                    <span style="font-size: 15px; font-weight: 700; color: #1a1a2e;">{{ zone.name }}</span>
+                    <span class="badge"
+                          [class]="getZoneStatus(zone) === 'available' ? 'badge-success' : getZoneStatus(zone) === 'limited' ? 'badge-warning' : 'badge-danger'">
+                      {{ getZoneStatus(zone) === 'available' ? 'Disponible' : getZoneStatus(zone) === 'limited' ? 'Limitado' : 'Lleno' }}
+                    </span>
+                  </div>
+                  <div style="font-size: 12px; color: #9ca3af; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ zone.description }}</div>
+                </div>
+              </div>
+
+              <!-- Stats row -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px;">
+                <div style="text-align: center; padding: 8px; background: #f0fdf4; border-radius: 8px;">
+                  <div style="font-size: 18px; font-weight: 800; color: #10b981;">{{ zone.availableSpots }}</div>
+                  <div style="font-size: 10px; color: #6b7280;">Libres</div>
+                </div>
+                <div style="text-align: center; padding: 8px; background: #fef2f2; border-radius: 8px;">
+                  <div style="font-size: 18px; font-weight: 800; color: #ef4444;">{{ zone.occupiedSpots }}</div>
+                  <div style="font-size: 10px; color: #6b7280;">Ocupados</div>
+                </div>
+                <div style="text-align: center; padding: 8px; background: #f0f2f5; border-radius: 8px;">
+                  <div style="font-size: 18px; font-weight: 800; color: #1a1a2e;">{{ zone.totalSpots }}</div>
+                  <div style="font-size: 10px; color: #6b7280;">Total</div>
+                </div>
+              </div>
+
+              <!-- Progress bar -->
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="(zone.availableSpots / zone.totalSpots) * 100" [style.background]="getZoneColor(zone)"></div>
+              </div>
+
+              <!-- Reservar CTA -->
+              @if (selectedZone()?.id === zone.id) {
+                <button class="btn btn-primary btn-block" style="margin-top: 12px; font-size: 13px; padding: 12px;"
+                        (click)="$event.stopPropagation(); navigateToReserve(zone.id)">
+                  <span class="mi" style="font-size: 18px;">event_available</span>
+                  Reservar en {{ zone.name }}
+                </button>
+              }
+            </div>
+          }
         </div>
       </div>
+
     </div>
-  }
-
-  <!-- Selected Zone Details -->
-  @if (selectedZone(); as zone) {
-    <div style="position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); display: flex; align-items: flex-end;" (click)="closeDetails()">
-      <div style="width: 100%; background: white; border-radius: 24px 24px 0 0; padding: 24px; animation: slideUp 0.3s ease; max-height: 70vh; overflow-y: auto;" (click)="$event.stopPropagation()">
-        <!-- Handle -->
-        <div style="width: 40px; height: 4px; border-radius: 2px; background: #d1d5db; margin: 0 auto 20px;"></div>
-
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-          <h3 style="font-size: 24px; font-weight: 800; color: #1a1a2e; margin: 0;">{{ zone.name }}</h3>
-          <button (click)="closeDetails()" style="width: 36px; height: 36px; border-radius: 50%; border: none; background: #f3f4f6; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-            <span class="mi" style="font-size: 20px; color: #6b7280;">close</span>
-          </button>
-        </div>
-
-        <p style="font-size: 14px; color: #6b7280; margin: 0 0 20px;">{{ zone.description || 'Zona de parqueo universitario' }}</p>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-          <div class="stat-card" style="text-align: center;">
-            <div class="stat-value" style="color: #10b981; font-size: 28px;">{{ zone.availableSpots }}</div>
-            <div class="stat-label">Libres</div>
-          </div>
-          <div class="stat-card" style="text-align: center;">
-            <div class="stat-value" style="color: #ef4444; font-size: 28px;">{{ zone.occupiedSpots }}</div>
-            <div class="stat-label">Ocupados</div>
-          </div>
-          <div class="stat-card" style="text-align: center;">
-            <div class="stat-value" style="color: #000066; font-size: 28px;">{{ zone.totalSpots }}</div>
-            <div class="stat-label">Total</div>
-          </div>
-        </div>
-
-        <div class="progress-bar" style="height: 12px; margin-bottom: 20px;">
-          <div class="progress-fill" [style.width.%]="(zone.availableSpots / zone.totalSpots) * 100" [style.background]="getZoneColor(zone)"></div>
-        </div>
-
-        <button class="btn btn-primary btn-block btn-lg" (click)="closeDetails()">
-          <span class="mi" style="font-size: 20px;">event_available</span>
-          Reservar en {{ zone.name }}
-        </button>
-      </div>
-    </div>
-  }
+  </div>
 </div>
+
+<style>
+.map-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 900px) {
+  .map-layout {
+    grid-template-columns: 1.4fr 1fr;
+    align-items: start;
+  }
+  .map-image-container {
+    position: sticky;
+    top: 80px;
+  }
+}
+</style>

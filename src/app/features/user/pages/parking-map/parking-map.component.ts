@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ParkingService } from '@application/services/parking.service';
 import { ParkingZone } from '@domain/entities/parking-zone.entity';
 import { LABELS } from '@shared/constants/labels.constants';
@@ -13,6 +14,7 @@ import { LABELS } from '@shared/constants/labels.constants';
 })
 export class ParkingMapComponent implements OnInit {
   private parkingService = inject(ParkingService);
+  private router = inject(Router);
 
   readonly labels = LABELS;
   readonly Math = Math;
@@ -31,6 +33,10 @@ export class ParkingMapComponent implements OnInit {
 
   closeDetails(): void {
     this.selectedZone.set(null);
+  }
+
+  navigateToReserve(zoneId: string): void {
+    this.router.navigate(['/reservations'], { queryParams: { zone: zoneId } });
   }
 
   getZoneColor(zone: ParkingZone): string {
