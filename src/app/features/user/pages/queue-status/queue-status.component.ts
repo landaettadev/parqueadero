@@ -2,12 +2,11 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { QueueService } from '@application/services/queue.service';
 import { LABELS } from '@shared/constants/labels.constants';
-import { StatusBadgeComponent } from '@shared/components/status-badge/status-badge.component';
 
 @Component({
   standalone: true,
   selector: 'app-queue-status',
-  imports: [CommonModule, StatusBadgeComponent],
+  imports: [CommonModule],
   templateUrl: './queue-status.component.html',
   styleUrl: './queue-status.component.scss'
 })

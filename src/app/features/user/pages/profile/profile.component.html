@@ -1,0 +1,123 @@
+<div class="page">
+  <!-- User Card -->
+  <div class="card gradient-primary" style="margin-bottom: 20px; padding: 24px;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center;">
+        <span class="mi" style="font-size: 32px; color: white;">person</span>
+      </div>
+      <div>
+        <div style="font-size: 20px; font-weight: 700;">{{ user.name }}</div>
+        <div style="font-size: 13px; opacity: 0.8;">{{ user.email }}</div>
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+          <span class="badge badge-info" style="background: rgba(255,255,255,0.2); color: white;">{{ user.role }}</span>
+          <span class="badge" style="background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9);">{{ user.carnet }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mis Vehiculos -->
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+    <h2 style="font-size: 18px; font-weight: 700; color: #1a1a2e; margin: 0;">Mis Vehiculos</h2>
+    <button (click)="toggleAddForm()" class="btn btn-sm btn-ghost">
+      <span class="mi" style="font-size: 18px;">{{ showAddForm() ? 'close' : 'add' }}</span>
+      {{ showAddForm() ? 'Cancelar' : 'Agregar' }}
+    </button>
+  </div>
+
+  <!-- Add Vehicle Form -->
+  @if (showAddForm()) {
+    <div class="card" style="margin-bottom: 16px; animation: fadeIn 0.3s ease;">
+      <div style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Nuevo vehiculo</div>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <input type="text" placeholder="Placa (ej: ABC-123)"
+               [value]="newPlate()"
+               (input)="newPlate.set($any($event.target).value)"
+               style="width: 100%; padding: 14px 16px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; font-family: inherit; outline: none; text-transform: uppercase;"
+               />
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          @for (t of ['car','motorcycle','bicycle','electric']; track t) {
+            <button (click)="newType.set($any(t))"
+                    style="padding: 10px 16px; border-radius: 10px; border: 2px solid; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; font-family: inherit; transition: all 0.2s;"
+                    [style.borderColor]="newType() === t ? '#000066' : '#e5e7eb'"
+                    [style.background]="newType() === t ? 'rgba(0,0,102,0.08)' : 'white'"
+                    [style.color]="newType() === t ? '#000066' : '#6b7280'">
+              <span class="mi" style="font-size: 18px;">{{ getVehicleIcon(t) }}</span>
+              {{ getTypeLabel(t) }}
+            </button>
+          }
+        </div>
+        <button (click)="addVehicle()" class="btn btn-primary btn-block">
+          <span class="mi" style="font-size: 18px;">add</span> Registrar Vehiculo
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Vehicle Cards -->
+  @for (vehicle of vehicles(); track vehicle.id) {
+    <div class="card" style="margin-bottom: 12px; display: flex; align-items: center; gap: 16px;">
+      <div style="width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center;"
+           [style.background]="vehicle.isDefault ? 'rgba(0,0,102,0.1)' : '#f3f4f6'">
+        <span class="mi" style="font-size: 26px;" [style.color]="vehicle.isDefault ? '#000066' : '#9ca3af'">{{ getVehicleIcon(vehicle.type) }}</span>
+      </div>
+      <div style="flex: 1;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 16px; font-weight: 700; color: #1a1a2e; letter-spacing: 1px;">{{ vehicle.plate }}</span>
+          @if (vehicle.isDefault) {
+            <span class="badge badge-success" style="font-size: 10px;">Principal</span>
+          }
+        </div>
+        <div style="font-size: 13px; color: #6b7280; margin-top: 2px;">
+          {{ vehicle.brand }} {{ vehicle.model }} · {{ vehicle.color }}
+        </div>
+      </div>
+      <div style="display: flex; gap: 4px;">
+        @if (!vehicle.isDefault) {
+          <button (click)="setDefault(vehicle.id)" style="width: 36px; height: 36px; border-radius: 10px; border: none; background: #f3f4f6; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+            <span class="mi" style="font-size: 18px; color: #6b7280;">star</span>
+          </button>
+        }
+        <button (click)="removeVehicle(vehicle.id)" style="width: 36px; height: 36px; border-radius: 10px; border: none; background: #fef2f2; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+          <span class="mi" style="font-size: 18px; color: #ef4444;">delete</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (vehicles().length === 0) {
+    <div class="card" style="text-align: center; padding: 40px 20px;">
+      <span class="mi" style="font-size: 48px; color: #d1d5db;">directions_car</span>
+      <p style="font-size: 14px; color: #9ca3af; margin: 8px 0 0;">No tienes vehiculos registrados</p>
+    </div>
+  }
+
+  <!-- Menu Options -->
+  <h2 style="font-size: 18px; font-weight: 700; color: #1a1a2e; margin: 24px 0 12px;">Opciones</h2>
+
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <div (click)="navigateTo('/history')" style="padding: 16px 20px; display: flex; align-items: center; gap: 14px; cursor: pointer; border-bottom: 1px solid #f3f4f6;">
+      <span class="mi" style="font-size: 22px; color: #000066;">history</span>
+      <div style="flex: 1;">
+        <div style="font-size: 15px; font-weight: 600; color: #1a1a2e;">Historial</div>
+        <div style="font-size: 12px; color: #9ca3af;">Ver mis sesiones de parqueo</div>
+      </div>
+      <span class="mi" style="font-size: 20px; color: #d1d5db;">chevron_right</span>
+    </div>
+    <div (click)="navigateTo('/prediction')" style="padding: 16px 20px; display: flex; align-items: center; gap: 14px; cursor: pointer; border-bottom: 1px solid #f3f4f6;">
+      <span class="mi" style="font-size: 22px; color: #000066;">psychology</span>
+      <div style="flex: 1;">
+        <div style="font-size: 15px; font-weight: 600; color: #1a1a2e;">Prediccion IA</div>
+        <div style="font-size: 12px; color: #9ca3af;">Mejor hora para llegar</div>
+      </div>
+      <span class="mi" style="font-size: 20px; color: #d1d5db;">chevron_right</span>
+    </div>
+    <div (click)="logout()" style="padding: 16px 20px; display: flex; align-items: center; gap: 14px; cursor: pointer;">
+      <span class="mi" style="font-size: 22px; color: #ef4444;">logout</span>
+      <div style="flex: 1;">
+        <div style="font-size: 15px; font-weight: 600; color: #ef4444;">Cerrar sesion</div>
+      </div>
+      <span class="mi" style="font-size: 20px; color: #d1d5db;">chevron_right</span>
+    </div>
+  </div>
+</div>

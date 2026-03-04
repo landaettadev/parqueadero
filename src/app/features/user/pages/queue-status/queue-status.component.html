@@ -1,192 +1,92 @@
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-  <!-- Header -->
-  <div class="mb-8">
-    <h1 class="text-4xl font-bold text-eafit-primary mb-2">
-      {{ labels.QUEUE_STATUS }}
-    </h1>
-    <p class="text-gray-600">Gestiona tu posición en la cola de espera</p>
-  </div>
+﻿<div class="page">
+  <h1 class="page-title">Cola de Espera</h1>
+  <p class="page-subtitle">Gestiona tu posicion en la cola</p>
 
   @if (isLoading()) {
-    <div class="flex justify-center items-center py-20">
-      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-eafit-primary"></div>
+    <div style="display: flex; justify-content: center; padding: 60px 0;">
+      <div style="width: 48px; height: 48px; border: 4px solid #e5e7eb; border-top-color: #000066; border-radius: 50%; animation: spin 1s linear infinite;"></div>
     </div>
   } @else {
     @if (isInQueue()) {
-      <!-- User in Queue -->
-      <div class="space-y-6">
-        <!-- Position Card -->
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-8 text-white">
-          <div class="text-center">
-            <p class="text-lg mb-2 opacity-90">Tu posición en la cola</p>
-            <div class="text-7xl font-bold mb-4">
-              #{{ userPosition()!.position }}
-            </div>
-            <p class="text-xl opacity-90">
-              de {{ queueSize() }} personas
-            </p>
-          </div>
-        </div>
-
-        <!-- Estimated Time -->
-        <div class="bg-white rounded-xl shadow-md p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl font-bold text-gray-800">Tiempo Estimado</h3>
-            <app-status-badge status="waiting" size="lg" />
-          </div>
-          
-          <div class="flex items-center gap-4 mb-6">
-            <svg class="w-12 h-12 text-eafit-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <p class="text-4xl font-bold text-eafit-primary">
-                ~{{ estimatedWaitTime() }} min
-              </p>
-              <p class="text-sm text-gray-600">Tiempo aproximado de espera</p>
-            </div>
-          </div>
-
-          <!-- Progress Bar -->
-          <div class="mb-4">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm text-gray-600">Progreso en la cola</span>
-              <span class="text-sm font-semibold text-gray-800">
-                {{ Math.round(getProgressPercentage()) }}%
-              </span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-3">
-              <div class="bg-blue-500 h-full rounded-full transition-all duration-500"
-                   [style.width.%]="getProgressPercentage()">
-              </div>
-            </div>
-          </div>
-
-          <p class="text-sm text-gray-500 text-center">
-            Te notificaremos cuando sea tu turno
-          </p>
-        </div>
-
-        <!-- Queue Info -->
-        <div class="bg-white rounded-xl shadow-md p-6">
-          <h3 class="text-xl font-bold text-gray-800 mb-4">Información de la Cola</h3>
-          
-          <div class="space-y-3">
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <span class="text-gray-600">Personas adelante:</span>
-              <span class="font-semibold text-gray-800">{{ userPosition()!.position - 1 }}</span>
-            </div>
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <span class="text-gray-600">Total en cola:</span>
-              <span class="font-semibold text-gray-800">{{ queueSize() }}</span>
-            </div>
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <span class="text-gray-600">Hora de ingreso:</span>
-              <span class="font-semibold text-gray-800">
-                {{ userPosition()!.joinedAt | date:'shortTime' }}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Leave Queue Button -->
-        <div class="bg-white rounded-xl shadow-md p-6">
-          <button 
-            (click)="confirmLeaveQueue()"
-            class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-            Salir de la Cola
-          </button>
-        </div>
-
-        <!-- Confirmation Modal -->
-        @if (showConfirmLeave()) {
-          <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-               (click)="cancelLeave()">
-            <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full"
-                 (click)="$event.stopPropagation()">
-              <div class="text-center mb-6">
-                <svg class="w-16 h-16 mx-auto text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">
-                  ¿Salir de la cola?
-                </h3>
-                <p class="text-gray-600">
-                  Perderás tu posición actual (#{{ userPosition()!.position }}) y tendrás que volver a unirte al final.
-                </p>
-              </div>
-              
-              <div class="flex gap-4">
-                <button 
-                  (click)="cancelLeave()"
-                  class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors">
-                  Cancelar
-                </button>
-                <button 
-                  (click)="leaveQueue()"
-                  class="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                  Salir
-                </button>
-              </div>
-            </div>
-          </div>
-        }
+      <!-- In Queue -->
+      <div class="card gradient-info" style="margin-bottom: 20px; padding: 28px; text-align: center;">
+        <div style="font-size: 13px; opacity: 0.8; margin-bottom: 8px;">Tu posicion</div>
+        <div style="font-size: 64px; font-weight: 900; letter-spacing: -2px; line-height: 1;">#{{ userPosition()!.position }}</div>
+        <div style="font-size: 14px; opacity: 0.8; margin-top: 8px;">de {{ queueSize() }} personas</div>
       </div>
+
+      <!-- Stats -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+        <div class="stat-card">
+          <div class="stat-label">Tiempo estimado</div>
+          <div class="stat-value" style="font-size: 28px; color: #000066;">~{{ estimatedWaitTime() }}m</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Adelante de ti</div>
+          <div class="stat-value" style="font-size: 28px; color: #6b7280;">{{ userPosition()!.position - 1 }}</div>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <span style="font-size: 14px; font-weight: 600; color: #1a1a2e;">Progreso</span>
+          <span style="font-size: 14px; font-weight: 700; color: #000066;">{{ Math.round(getProgressPercentage()) }}%</span>
+        </div>
+        <div class="progress-bar" style="height: 12px;">
+          <div class="progress-fill" [style.width.%]="getProgressPercentage()" style="background: #3b82f6;"></div>
+        </div>
+        <div style="font-size: 13px; color: #9ca3af; margin-top: 12px; text-align: center;">
+          <span class="mi" style="font-size: 16px; vertical-align: middle;">notifications_active</span>
+          Te notificaremos cuando sea tu turno
+        </div>
+      </div>
+
+      <!-- Leave Queue -->
+      <button (click)="confirmLeaveQueue()" class="btn btn-danger btn-block btn-lg">
+        <span class="mi" style="font-size: 20px;">logout</span>
+        Salir de la Cola
+      </button>
+
+      <!-- Confirm Modal -->
+      @if (showConfirmLeave()) {
+        <div style="position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: 16px;" (click)="cancelLeave()">
+          <div class="card" style="max-width: 360px; width: 100%; text-align: center; animation: fadeIn 0.2s ease;" (click)="$event.stopPropagation()">
+            <span class="mi" style="font-size: 56px; color: #ef4444;">warning</span>
+            <h3 style="font-size: 20px; font-weight: 700; margin: 12px 0 8px;">Salir de la cola?</h3>
+            <p style="font-size: 14px; color: #6b7280; margin: 0 0 20px;">Perderas tu posicion #{{ userPosition()!.position }}</p>
+            <div style="display: flex; gap: 12px;">
+              <button (click)="cancelLeave()" class="btn btn-ghost" style="flex: 1;">Cancelar</button>
+              <button (click)="leaveQueue()" class="btn btn-danger" style="flex: 1;">Salir</button>
+            </div>
+          </div>
+        </div>
+      }
     } @else {
       <!-- Not in Queue -->
-      <div class="bg-white rounded-xl shadow-lg p-8">
-        <div class="text-center max-w-md mx-auto">
-          <svg class="w-24 h-24 mx-auto text-gray-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-          
-          <h2 class="text-3xl font-bold text-gray-800 mb-4">
-            No estás en la cola
-          </h2>
-          
-          <p class="text-gray-600 mb-8">
-            Únete a la cola de espera para ser notificado cuando haya un espacio disponible en el parqueadero.
-          </p>
-
-          <!-- Queue Stats -->
-          <div class="bg-gray-50 rounded-lg p-6 mb-8">
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-gray-600">Personas en cola:</span>
-              <span class="text-2xl font-bold text-eafit-primary">{{ queueSize() }}</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="text-gray-600">Tiempo estimado:</span>
-              <span class="text-lg font-semibold text-gray-800">
-                ~{{ queueSize() * 5 }} min
-              </span>
-            </div>
-          </div>
-
-          <button 
-            (click)="joinQueue()"
-            [disabled]="isLoading()"
-            class="w-full bg-eafit-primary hover:bg-eafit-primary/90 text-white font-semibold py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-            @if (isLoading()) {
-              <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Uniéndose...
-            } @else {
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              {{ labels.JOIN_QUEUE }}
-            }
-          </button>
-
-          <p class="text-sm text-gray-500 mt-4">
-            Recibirás una notificación cuando sea tu turno
-          </p>
+      <div class="card" style="text-align: center; padding: 40px 24px; margin-bottom: 20px;">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(59,130,246,0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+          <span class="mi" style="font-size: 40px; color: #3b82f6;">groups</span>
         </div>
+        <h2 style="font-size: 22px; font-weight: 800; color: #1a1a2e; margin: 0 0 8px;">No estas en la cola</h2>
+        <p style="font-size: 14px; color: #6b7280; margin: 0 0 24px;">Unete para ser notificado cuando haya espacio disponible</p>
+
+        <!-- Queue Info -->
+        <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+          <div class="stat-card" style="flex: 1; text-align: center;">
+            <div class="stat-value" style="font-size: 28px; color: #3b82f6;">{{ queueSize() }}</div>
+            <div class="stat-label">En cola</div>
+          </div>
+          <div class="stat-card" style="flex: 1; text-align: center;">
+            <div class="stat-value" style="font-size: 28px; color: #6b7280;">~{{ queueSize() * 5 }}m</div>
+            <div class="stat-label">Espera est.</div>
+          </div>
+        </div>
+
+        <button (click)="joinQueue()" [disabled]="isLoading()" class="btn btn-primary btn-block btn-lg">
+          <span class="mi" style="font-size: 20px;">add_circle</span>
+          Unirme a la Cola
+        </button>
       </div>
     }
   }

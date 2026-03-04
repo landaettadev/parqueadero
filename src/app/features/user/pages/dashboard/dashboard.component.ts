@@ -2,56 +2,65 @@ import { Component, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ParkingService } from '@application/services/parking.service';
-import { LABELS } from '@shared/constants/labels.constants';
-import { ROUTES } from '@core/constants/routes.constants';
-import { ParkingCardComponent } from '@shared/components/parking-card/parking-card.component';
-import { MetricCardComponent } from '@shared/components/metric-card/metric-card.component';
+import { ReservationService } from '@application/services/reservation.service';
+import { VehicleService } from '@application/services/vehicle.service';
+import { QueueService } from '@application/services/queue.service';
 
 @Component({
   standalone: true,
   selector: 'app-dashboard',
-  imports: [
-    CommonModule,
-    ParkingCardComponent,
-    MetricCardComponent
-  ],
+  imports: [CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
   private parkingService = inject(ParkingService);
-  private router = inject(Router);
+  private reservationService = inject(ReservationService);
+  private vehicleService = inject(VehicleService);
+  private queueService = inject(QueueService);
+  router = inject(Router);
 
-  readonly labels = LABELS;
-  readonly routes = ROUTES;
-
-  // Signals del servicio
   zones = this.parkingService.zones;
   totalAvailability = this.parkingService.totalAvailability;
   isLoading = this.parkingService.isLoading;
+  activeReservation = this.reservationService.activeReservation;
+  defaultVehicle = this.vehicleService.defaultVehicle;
+  queueSize = this.queueService.queueSize;
 
-  // Computed
-  isFull = computed(() => this.totalAvailability().available === 0);
   occupancyPercentage = computed(() => {
     const total = this.totalAvailability().total;
     const occupied = this.totalAvailability().occupied;
     return total > 0 ? Math.round((occupied / total) * 100) : 0;
   });
 
+  availabilityColor = computed(() => {
+    const pct = 100 - this.occupancyPercentage();
+    if (pct > 50) return '#10b981';
+    if (pct > 20) return '#f59e0b';
+    return '#ef4444';
+  });
+
   ngOnInit(): void {
-    // Cargar datos iniciales
     this.parkingService.loadZones().subscribe();
     this.parkingService.loadTotalAvailability().subscribe();
-    
-    // Suscribirse a actualizaciones en tiempo real
     this.parkingService.subscribeToRealtimeUpdates();
   }
 
-  navigateToMap(): void {
-    this.router.navigate([this.routes.USER.MAP]);
+  getZoneColor(zone: any): string {
+    const pct = (zone.availableSpots / zone.totalSpots) * 100;
+    if (pct > 50) return '#10b981';
+    if (pct > 20) return '#f59e0b';
+    return '#ef4444';
   }
 
-  navigateToQueue(): void {
-    this.router.navigate([this.routes.USER.QUEUE]);
+  getZoneLabel(zone: any): string {
+    const pct = (zone.availableSpots / zone.totalSpots) * 100;
+    if (pct > 50) return 'Disponible';
+    if (pct > 20) return 'Limitado';
+    return 'Lleno';
+  }
+
+  navigate(route: string): void {
+    this.router.navigate([route]);
   }
 }

@@ -40,6 +40,14 @@ export const routes: Routes = [
       {
         path: 'history',
         loadComponent: () => import('./features/user/pages/history/history.component').then(m => m.HistoryComponent)
+      },
+      {
+        path: 'reservations',
+        loadComponent: () => import('./features/user/pages/reservations/reservations.component').then(m => m.ReservationsComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/user/pages/profile/profile.component').then(m => m.ProfileComponent)
       }
     ]
   },

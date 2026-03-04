@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ParkingService } from '@application/services/parking.service';
 import { ParkingZone } from '@domain/entities/parking-zone.entity';
 import { LABELS } from '@shared/constants/labels.constants';
-import { StatusBadgeComponent } from '@shared/components/status-badge/status-badge.component';
 
 @Component({
   standalone: true,
   selector: 'app-parking-map',
-  imports: [CommonModule, StatusBadgeComponent],
+  imports: [CommonModule],
   templateUrl: './parking-map.component.html',
   styleUrl: './parking-map.component.scss'
 })

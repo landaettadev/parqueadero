@@ -1,0 +1,143 @@
+<div class="page">
+  <h1 class="page-title">Reservas</h1>
+  <p class="page-subtitle">Reserva tu espacio con anticipacion</p>
+
+  <!-- Active Reservation -->
+  @if (activeReservation(); as res) {
+    <div class="card gradient-primary" style="margin-bottom: 20px; padding: 24px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+        <span style="font-size: 13px; font-weight: 600; opacity: 0.8;">RESERVA ACTIVA</span>
+        <span class="badge" style="background: rgba(255,255,255,0.2); color: white;">{{ getStatusLabel(res.status) }}</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+        <div style="width: 56px; height: 56px; border-radius: 14px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;">
+          <span class="mi" style="font-size: 28px;">local_parking</span>
+        </div>
+        <div>
+          <div style="font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">{{ res.spotId }}</div>
+          <div style="font-size: 14px; opacity: 0.8;">{{ getZoneName(res.zoneId) }}</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; text-align: center;">
+          <div style="font-size: 11px; opacity: 0.7;">Hora reservada</div>
+          <div style="font-size: 18px; font-weight: 700;">{{ formatTime(res.scheduledTime) }}</div>
+        </div>
+        <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; text-align: center;">
+          <div style="font-size: 11px; opacity: 0.7;">Expira</div>
+          <div style="font-size: 18px; font-weight: 700;">{{ formatTime(res.expiresAt) }}</div>
+        </div>
+      </div>
+      <button (click)="cancelReservation(res.id)"
+              style="width: 100%; padding: 14px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.3); background: transparent; color: white; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;">
+        Cancelar Reserva
+      </button>
+    </div>
+  }
+
+  <!-- New Reservation Button -->
+  @if (!activeReservation()) {
+    @if (!showNewForm()) {
+      <div (click)="showNewForm.set(true)" class="card" style="margin-bottom: 20px; cursor: pointer; display: flex; align-items: center; gap: 16px; border: 2px dashed #d1d5db;">
+        <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(0,0,102,0.08); display: flex; align-items: center; justify-content: center;">
+          <span class="mi" style="font-size: 26px; color: #000066;">add_circle</span>
+        </div>
+        <div>
+          <div style="font-size: 16px; font-weight: 700; color: #000066;">Nueva Reserva</div>
+          <div style="font-size: 13px; color: #9ca3af;">Reserva un espacio hasta 30 min antes</div>
+        </div>
+      </div>
+    } @else {
+      <!-- New Reservation Form -->
+      <div class="card" style="margin-bottom: 20px; animation: fadeIn 0.3s ease;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+          <span style="font-size: 16px; font-weight: 700; color: #1a1a2e;">Nueva Reserva</span>
+          <button (click)="showNewForm.set(false)" style="border: none; background: none; cursor: pointer;">
+            <span class="mi" style="font-size: 22px; color: #9ca3af;">close</span>
+          </button>
+        </div>
+
+        <!-- Zone Selection -->
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 13px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Zona</div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            @for (zone of zones(); track zone.id) {
+              <button (click)="selectedZone.set(zone.id)"
+                      style="flex: 1; min-width: 80px; padding: 14px 12px; border-radius: 12px; border: 2px solid; cursor: pointer; text-align: center; font-family: inherit; transition: all 0.2s;"
+                      [style.borderColor]="selectedZone() === zone.id ? '#000066' : '#e5e7eb'"
+                      [style.background]="selectedZone() === zone.id ? 'rgba(0,0,102,0.08)' : 'white'"
+                      [style.color]="selectedZone() === zone.id ? '#000066' : '#6b7280'">
+                <div style="font-size: 15px; font-weight: 700;">{{ zone.name }}</div>
+                <div style="font-size: 12px; margin-top: 2px;">{{ zone.availableSpots }} libres</div>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Time Selection -->
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 13px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">Llego en</div>
+          <div style="display: flex; gap: 8px;">
+            @for (min of [10, 20, 30]; track min) {
+              <button (click)="selectedMinutes.set(min)"
+                      style="flex: 1; padding: 14px; border-radius: 12px; border: 2px solid; cursor: pointer; text-align: center; font-family: inherit; transition: all 0.2s;"
+                      [style.borderColor]="selectedMinutes() === min ? '#000066' : '#e5e7eb'"
+                      [style.background]="selectedMinutes() === min ? 'rgba(0,0,102,0.08)' : 'white'"
+                      [style.color]="selectedMinutes() === min ? '#000066' : '#6b7280'">
+                <div style="font-size: 18px; font-weight: 700;">{{ min }}</div>
+                <div style="font-size: 11px;">minutos</div>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Vehicle -->
+        @if (defaultVehicle(); as vehicle) {
+          <div style="margin-bottom: 16px; padding: 14px; background: #f9fafb; border-radius: 12px; display: flex; align-items: center; gap: 12px;">
+            <span class="mi" style="font-size: 22px; color: #000066;">{{ getVehicleIcon(vehicle.id) }}</span>
+            <div>
+              <div style="font-size: 14px; font-weight: 600;">{{ vehicle.plate }}</div>
+              <div style="font-size: 12px; color: #9ca3af;">{{ vehicle.brand }} {{ vehicle.model }}</div>
+            </div>
+          </div>
+        }
+
+        <button (click)="createReservation()" class="btn btn-primary btn-block btn-lg">
+          <span class="mi" style="font-size: 20px;">event_available</span>
+          Confirmar Reserva
+        </button>
+      </div>
+    }
+  }
+
+  <!-- Reservation History -->
+  <h2 style="font-size: 18px; font-weight: 700; color: #1a1a2e; margin: 0 0 12px;">Historial de Reservas</h2>
+
+  @for (res of reservations(); track res.id) {
+    <div class="card" style="margin-bottom: 12px; display: flex; align-items: center; gap: 14px;">
+      <div style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;"
+           [style.background]="res.status === 'CONFIRMED' || res.status === 'ACTIVE' ? 'rgba(0,0,102,0.08)' : '#f3f4f6'">
+        <span class="mi" style="font-size: 24px;"
+              [style.color]="res.status === 'CONFIRMED' || res.status === 'ACTIVE' ? '#000066' : '#9ca3af'">
+          {{ res.status === 'CANCELLED' ? 'cancel' : res.status === 'EXPIRED' ? 'schedule' : 'local_parking' }}
+        </span>
+      </div>
+      <div style="flex: 1;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 15px; font-weight: 700; color: #1a1a2e;">{{ res.spotId || getZoneName(res.zoneId) }}</span>
+          <span class="badge" [class]="getStatusBadge(res.status)">{{ getStatusLabel(res.status) }}</span>
+        </div>
+        <div style="font-size: 12px; color: #9ca3af; margin-top: 2px;">
+          {{ getZoneName(res.zoneId) }} · {{ formatTime(res.scheduledTime) }}
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (reservations().length === 0) {
+    <div class="card" style="text-align: center; padding: 40px;">
+      <span class="mi" style="font-size: 48px; color: #d1d5db;">event_busy</span>
+      <p style="font-size: 14px; color: #9ca3af; margin: 8px 0 0;">No tienes reservas</p>
+    </div>
+  }
+</div>

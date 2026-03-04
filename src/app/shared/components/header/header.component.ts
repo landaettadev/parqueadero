@@ -1,10 +1,8 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthRepository } from '@domain/repositories/auth.repository';
 import { MenuService } from '@application/services/menu.service';
-import { IMAGES } from '@shared/constants/images.constants';
-import { LABELS } from '@shared/constants/labels.constants';
+import { NotificationService } from '@application/services/notification.service';
 
 @Component({
   standalone: true,
@@ -14,36 +12,32 @@ import { LABELS } from '@shared/constants/labels.constants';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  private authRepo = inject(AuthRepository);
   private menuService = inject(MenuService);
+  private notifService = inject(NotificationService);
   router = inject(Router);
 
-  readonly images = IMAGES;
-  readonly labels = LABELS;
-  
-  // Signal del menú desde el servicio
   isMenuOpen = this.menuService.isOpen;
-  
-  currentUser = computed<{ fullName: string } | null>(() => {
-    return null;
-  });
-
-  get userName(): string {
-    const user = this.currentUser();
-    return user?.fullName || 'Usuario';
-  }
-
-  get isAuthenticated(): boolean {
-    return true; // Siempre mostrar menú para MVP
-  }
+  unreadCount = this.notifService.unreadCount;
+  showNotifPanel = signal(false);
+  notifications = this.notifService.notifications;
 
   toggleMenu(): void {
     this.menuService.toggle();
   }
 
-  logout(): void {
-    this.authRepo.logout().subscribe(() => {
-      this.router.navigate(['/auth/login']);
-    });
+  toggleNotifications(): void {
+    this.showNotifPanel.update(v => !v);
+    if (this.showNotifPanel()) {
+      this.notifService.markAllAsRead();
+    }
+  }
+
+  getTimeAgo(date: Date): string {
+    return this.notifService.getTimeAgo(date);
+  }
+
+  navigate(route: string): void {
+    this.router.navigate([route]);
+    this.showNotifPanel.set(false);
   }
 }

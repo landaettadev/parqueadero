@@ -1,31 +1,62 @@
-<header style="width: 100%; height: 70px; background-color: #000066; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-  <nav style="width: 100%; height: 100%; padding: 0 24px; display: flex; align-items: center; justify-content: space-between;">
-    <!-- Logo Smart Parking -->
-    <div style="display: flex; align-items: center; gap: 16px; cursor: pointer;" (click)="router.navigate(['/dashboard'])">
-      <img 
-        src="logo.png"
-        alt="Smart Parking EAFIT Logo" 
-        style="height: 50px; width: auto;" />
-      <span style="color: white; font-size: 18px; font-weight: 600; display: none;">Smart Parking</span>
+﻿<!-- Top Header Bar -->
+<header style="position: sticky; top: 0; z-index: 40; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 0 16px; height: 60px; display: flex; align-items: center; justify-content: space-between;">
+  <!-- Logo -->
+  <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" (click)="navigate('/dashboard')">
+    <img src="logo.png" alt="Smart Parking" style="height: 40px; width: auto;" />
+    <div>
+      <div style="font-size: 16px; font-weight: 800; color: #000066; letter-spacing: -0.5px; line-height: 1.1;">Smart Parking</div>
+      <div style="font-size: 10px; font-weight: 500; color: #9ca3af; letter-spacing: 1px; text-transform: uppercase;">EAFIT</div>
     </div>
+  </div>
 
-    <!-- User Info & Menu -->
-    <div style="display: flex; align-items: center; gap: 16px;">
-      <!-- User Name -->
-      <span style="color: white; font-weight: 500; font-size: 14px;">
-        {{ userName }}
-      </span>
+  <!-- Right Actions -->
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <!-- Notifications -->
+    <button (click)="toggleNotifications()" style="position: relative; width: 44px; height: 44px; border-radius: 12px; border: none; background: #f3f4f6; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; -webkit-tap-highlight-color: transparent;">
+      <span class="mi" style="font-size: 22px; color: #374151;">notifications</span>
+      @if (unreadCount() > 0) {
+        <span style="position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; background: #ef4444; color: white; border-radius: 50%; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid white;">
+          {{ unreadCount() }}
+        </span>
+      }
+    </button>
 
-      <!-- Menu Button (Hamburguesa) -->
-      <button 
-        (click)="toggleMenu()" 
-        style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: white; background: rgba(255,255,255,0.15); border: none; border-radius: 10px; cursor: pointer; transition: background 0.2s;"
-        [attr.aria-label]="labels.MENU"
-        [attr.aria-expanded]="isMenuOpen()">
-        <svg style="width: 28px; height: 28px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-    </div>
-  </nav>
+    <!-- Menu Toggle -->
+    <button (click)="toggleMenu()" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: #000066; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; -webkit-tap-highlight-color: transparent;">
+      <span class="mi" style="font-size: 22px; color: white;">{{ isMenuOpen() ? 'close' : 'menu' }}</span>
+    </button>
+  </div>
 </header>
+
+<!-- Notification Panel -->
+@if (showNotifPanel()) {
+  <div (click)="toggleNotifications()" style="position: fixed; inset: 0; z-index: 45; background: rgba(0,0,0,0.3);"></div>
+  <div style="position: fixed; top: 60px; right: 8px; z-index: 50; width: 340px; max-width: calc(100vw - 16px); background: white; border-radius: 16px; box-shadow: 0 16px 48px rgba(0,0,0,0.16); animation: fadeIn 0.2s ease; overflow: hidden;">
+    <div style="padding: 16px 20px; border-bottom: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between;">
+      <span style="font-size: 16px; font-weight: 700; color: #1a1a2e;">Notificaciones</span>
+      <span style="font-size: 12px; color: #9ca3af; cursor: pointer;" (click)="toggleNotifications()">Cerrar</span>
+    </div>
+    <div style="max-height: 360px; overflow-y: auto;">
+      @for (notif of notifications(); track notif.id) {
+        <div (click)="notif.actionRoute ? navigate(notif.actionRoute) : null" style="padding: 14px 20px; border-bottom: 1px solid #f9fafb; display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: background 0.15s;"
+             [style.background]="notif.read ? 'white' : '#f0f7ff'">
+          <span class="mi" style="font-size: 20px; margin-top: 2px;"
+                [style.color]="notif.type === 'success' ? '#10b981' : notif.type === 'warning' ? '#f59e0b' : notif.type === 'error' ? '#ef4444' : '#3b82f6'">
+            {{ notif.icon }}
+          </span>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 13px; font-weight: 600; color: #1a1a2e;">{{ notif.title }}</div>
+            <div style="font-size: 12px; color: #6b7280; margin-top: 2px; line-height: 1.4;">{{ notif.message }}</div>
+            <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">{{ getTimeAgo(notif.createdAt) }}</div>
+          </div>
+        </div>
+      }
+      @if (notifications().length === 0) {
+        <div style="padding: 40px 20px; text-align: center;">
+          <span class="mi" style="font-size: 40px; color: #d1d5db;">notifications_off</span>
+          <p style="font-size: 14px; color: #9ca3af; margin: 8px 0 0;">Sin notificaciones</p>
+        </div>
+      }
+    </div>
+  </div>
+}

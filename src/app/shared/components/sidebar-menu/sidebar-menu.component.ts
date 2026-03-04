@@ -22,7 +22,7 @@ interface MenuItem {
 })
 export class SidebarMenuComponent {
   private authRepo = inject(AuthRepository);
-  private router = inject(Router);
+  router = inject(Router);
   private menuService = inject(MenuService);
   private platformId = inject(PLATFORM_ID);
 
