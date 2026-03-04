@@ -1,0 +1,320 @@
+<div class="page">
+
+  <!-- Header -->
+  <h1 class="page-title">Camaras & LPR</h1>
+  <p class="page-subtitle">Vigilancia, deteccion y localizador de vehiculos</p>
+
+  <!-- Stat chips -->
+  <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: #f0fdf4; border-radius: 20px; border: 1px solid #bbf7d0;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; animation: pulse 1.5s infinite;"></span>
+      <span style="font-size: 13px; font-weight: 700; color: #065f46;">{{ liveCamerasCount() }} en vivo</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: #f0f7ff; border-radius: 20px; border: 1px solid #bfdbfe;">
+      <span class="mi" style="font-size: 16px; color: #3b82f6;">document_scanner</span>
+      <span style="font-size: 13px; font-weight: 700; color: #1e40af;">{{ lprEvents().length }} detecciones hoy</span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display: flex; gap: 0; background: #f3f4f6; border-radius: 14px; padding: 4px; margin-bottom: 20px;">
+    @for (tab of [{v:'cameras',l:'Camaras',i:'videocam'},{v:'lpr',l:'LPR',i:'document_scanner'},{v:'locate',l:'Buscar',i:'search'}]; track tab.v) {
+      <button (click)="activeTab.set($any(tab.v))"
+              style="flex: 1; padding: 10px 8px; border-radius: 10px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;"
+              [style.background]="activeTab() === tab.v ? 'white' : 'transparent'"
+              [style.color]="activeTab() === tab.v ? '#000066' : '#9ca3af'"
+              [style.boxShadow]="activeTab() === tab.v ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'">
+        <span class="mi" style="font-size: 16px;">{{ tab.i }}</span>
+        {{ tab.l }}
+      </button>
+    }
+  </div>
+
+  <!-- ======== TAB: CAMARAS EN VIVO ======== -->
+  @if (activeTab() === 'cameras') {
+
+    <!-- Filtro tipo -->
+    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+      @for (f of [{v:'all',l:'Todas'},{v:'car',l:'Carros'},{v:'motorcycle',l:'Motos'}]; track f.v) {
+        <button (click)="cameraFilter.set($any(f.v))"
+                style="padding: 7px 16px; border-radius: 20px; border: 1.5px solid; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; transition: all 0.2s;"
+                [style.borderColor]="cameraFilter() === f.v ? '#000066' : '#e5e7eb'"
+                [style.background]="cameraFilter() === f.v ? 'rgba(0,0,102,0.08)' : 'white'"
+                [style.color]="cameraFilter() === f.v ? '#000066' : '#6b7280'">
+          {{ f.l }}
+        </button>
+      }
+    </div>
+
+    <!-- Grid de camaras -->
+    <div style="display: grid; grid-template-columns: 1fr; gap: 14px;">
+      @for (cam of filteredCameras(); track cam.id) {
+        <div class="card" style="padding: 0; overflow: hidden; cursor: pointer;" (click)="selectedCamera.set(cam)">
+          <!-- Camera feed -->
+          <div style="position: relative; background: #0a0a1a;">
+            <img [src]="cam.imageUrl" [alt]="cam.name" style="width: 100%; height: 180px; object-fit: cover; display: block;" />
+            <!-- Live badge -->
+            @if (cam.status === 'live') {
+              <div style="position: absolute; top: 10px; left: 10px; display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 20px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: #ef4444; animation: pulse 1s infinite;"></span>
+                <span style="font-size: 11px; font-weight: 800; color: white; letter-spacing: 1px;">EN VIVO</span>
+              </div>
+            } @else {
+              <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 20px;">
+                <span style="font-size: 11px; font-weight: 800; color: #ef4444;">SIN SEÑAL</span>
+              </div>
+            }
+            <!-- Vehicle type badge -->
+            <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,102,0.85); padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 4px;">
+              <span class="mi" style="font-size: 13px; color: white;">{{ cam.vehicleType === 'car' ? 'directions_car' : 'two_wheeler' }}</span>
+              <span style="font-size: 11px; font-weight: 700; color: white;">Entrada {{ cam.entrance }}</span>
+            </div>
+          </div>
+          <!-- Info bar -->
+          <div style="padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-size: 14px; font-weight: 700; color: #1a1a2e;">{{ cam.name }}</div>
+              <div style="font-size: 12px; color: #9ca3af; margin-top: 2px;">{{ cam.location }}</div>
+            </div>
+            @if (cam.status === 'live') {
+              <div style="text-align: right;">
+                <div style="font-size: 11px; color: #9ca3af;">hoy</div>
+                <div style="font-size: 16px; font-weight: 800; color: #000066;">{{ cam.detections }}</div>
+                <div style="font-size: 10px; color: #9ca3af;">detecciones</div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ======== TAB: LPR DETECCION ======== -->
+  @if (activeTab() === 'lpr') {
+
+    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+      @for (f of [{v:'all',l:'Todos'},{v:'entry',l:'Entradas'},{v:'exit',l:'Salidas'}]; track f.v) {
+        <button (click)="lprFilter.set($any(f.v))"
+                style="padding: 7px 16px; border-radius: 20px; border: 1.5px solid; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; transition: all 0.2s;"
+                [style.borderColor]="lprFilter() === f.v ? '#000066' : '#e5e7eb'"
+                [style.background]="lprFilter() === f.v ? 'rgba(0,0,102,0.08)' : 'white'"
+                [style.color]="lprFilter() === f.v ? '#000066' : '#6b7280'">{{ f.l }}</button>
+      }
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      @for (ev of filteredLpr(); track ev.id) {
+        <div class="card" style="padding: 14px 16px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <!-- Action icon -->
+            <div style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                 [style.background]="ev.action === 'entry' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'">
+              <span class="mi" style="font-size: 22px;" [style.color]="ev.action === 'entry' ? '#10b981' : '#ef4444'">
+                {{ ev.action === 'entry' ? 'login' : 'logout' }}
+              </span>
+            </div>
+
+            <div style="flex: 1; min-width: 0;">
+              <!-- Plate -->
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <span style="font-size: 18px; font-weight: 900; color: #1a1a2e; letter-spacing: 2px; font-family: monospace;">{{ ev.plate }}</span>
+                <span class="mi" style="font-size: 16px; color: #6b7280;">{{ ev.vehicleType === 'car' ? 'directions_car' : 'two_wheeler' }}</span>
+                <span style="font-size: 11px; padding: 2px 8px; border-radius: 8px; font-weight: 700;"
+                      [style.background]="ev.action === 'entry' ? '#dcfce7' : '#fee2e2'"
+                      [style.color]="ev.action === 'entry' ? '#166534' : '#991b1b'">
+                  {{ ev.action === 'entry' ? 'ENTRADA' : 'SALIDA' }}
+                </span>
+              </div>
+              <!-- Details -->
+              <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                @if (ev.cell !== '—') {
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <span class="mi" style="font-size: 13px; color: #000066;">grid_on</span>
+                    <span style="font-size: 12px; font-weight: 700; color: #000066;">Celda {{ ev.cell }}</span>
+                  </div>
+                }
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <span class="mi" style="font-size: 13px; color: #9ca3af;">videocam</span>
+                  <span style="font-size: 12px; color: #6b7280;">{{ ev.camera }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <span class="mi" style="font-size: 13px; color: #9ca3af;">schedule</span>
+                  <span style="font-size: 12px; color: #9ca3af;">{{ getTimeAgo(ev.timestamp) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Confidence -->
+            <div style="text-align: center; flex-shrink: 0;">
+              <div style="font-size: 16px; font-weight: 800;"
+                   [style.color]="ev.confidence >= 97 ? '#10b981' : ev.confidence >= 92 ? '#f59e0b' : '#ef4444'">
+                {{ ev.confidence }}%
+              </div>
+              <div style="font-size: 10px; color: #9ca3af;">LPR</div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ======== TAB: LOCALIZADOR ======== -->
+  @if (activeTab() === 'locate') {
+
+    <!-- Buscador -->
+    <div class="card" style="padding: 20px; margin-bottom: 16px;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span class="mi" style="font-size: 22px; color: #000066;">search</span>
+        <div>
+          <div style="font-size: 16px; font-weight: 800; color: #1a1a2e;">Buscar mi vehiculo</div>
+          <div style="font-size: 12px; color: #9ca3af;">Ingresa la placa para localizarlo en el parqueadero</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <input type="text" [ngModel]="searchPlate()" (ngModelChange)="searchPlate.set($event.toUpperCase())"
+               placeholder="Ej: EAF-123"
+               style="flex: 1; padding: 14px 16px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 16px; font-family: monospace; font-weight: 700; letter-spacing: 2px; outline: none; text-transform: uppercase; box-sizing: border-box;"
+               (keydown.enter)="searchVehicle()" />
+        <button (click)="searchVehicle()" [disabled]="!searchPlate() || searchLoading()"
+                style="padding: 14px 18px; background: #000066; color: white; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 14px; font-weight: 700; font-family: inherit; min-width: 80px; transition: opacity 0.2s;"
+                [style.opacity]="!searchPlate() || searchLoading() ? '0.5' : '1'">
+          @if (searchLoading()) {
+            <div style="width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+          } @else {
+            <span class="mi" style="font-size: 20px;">search</span>
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Resultado -->
+    @if (searchDone()) {
+      @if (searchResult()?.found) {
+        <!-- ENCONTRADO -->
+        <div style="background: linear-gradient(135deg, #000033, #000066); border-radius: 20px; padding: 24px; color: white; animation: fadeIn 0.4s ease;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+            <div style="width: 44px; height: 44px; border-radius: 50%; background: #10b981; display: flex; align-items: center; justify-content: center;">
+              <span class="mi" style="font-size: 24px;">check</span>
+            </div>
+            <div>
+              <div style="font-size: 13px; opacity: 0.7;">Vehiculo localizado</div>
+              <div style="font-size: 24px; font-weight: 900; letter-spacing: 3px; font-family: monospace;">{{ searchResult()?.plate }}</div>
+            </div>
+          </div>
+
+          <!-- Ubicacion destacada -->
+          <div style="background: rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; margin-bottom: 16px; text-align: center;">
+            <div style="font-size: 11px; opacity: 0.6; letter-spacing: 1px; margin-bottom: 8px;">UBICACION ACTUAL</div>
+            <div style="font-size: 32px; font-weight: 900; letter-spacing: 2px; color: #4ade80; margin-bottom: 4px;">{{ searchResult()?.cell }}</div>
+            <div style="font-size: 14px; opacity: 0.8;">{{ searchResult()?.zone }}</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div style="background: rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; text-align: center;">
+              <span class="mi" style="font-size: 22px; color: #93c5fd; display: block; margin-bottom: 4px;">{{ searchResult()?.vehicleType === 'car' ? 'directions_car' : 'two_wheeler' }}</span>
+              <div style="font-size: 11px; opacity: 0.6; margin-bottom: 2px;">TIPO</div>
+              <div style="font-size: 13px; font-weight: 700;">{{ searchResult()?.vehicleType === 'car' ? 'Automovil' : 'Motocicleta' }}</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; text-align: center;">
+              <span class="mi" style="font-size: 22px; color: #93c5fd; display: block; margin-bottom: 4px;">timelapse</span>
+              <div style="font-size: 11px; opacity: 0.6; margin-bottom: 2px;">TIEMPO</div>
+              <div style="font-size: 13px; font-weight: 700;">{{ getParkedDuration(searchResult()!.entryTime) }}</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; text-align: center;">
+              <span class="mi" style="font-size: 22px; color: #93c5fd; display: block; margin-bottom: 4px;">schedule</span>
+              <div style="font-size: 11px; opacity: 0.6; margin-bottom: 2px;">ENTRADA</div>
+              <div style="font-size: 13px; font-weight: 700;">{{ formatTime(searchResult()!.entryTime) }}</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; text-align: center;">
+              <span class="mi" style="font-size: 22px; color: #93c5fd; display: block; margin-bottom: 4px;">login</span>
+              <div style="font-size: 11px; opacity: 0.6; margin-bottom: 2px;">ENTRADA No.</div>
+              <div style="font-size: 13px; font-weight: 700;">Entrada {{ searchResult()?.entrance }}</div>
+            </div>
+          </div>
+
+          <button (click)="clearSearch()" style="width: 100%; margin-top: 16px; padding: 14px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.3); background: transparent; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;">
+            Nueva busqueda
+          </button>
+        </div>
+
+      } @else {
+        <!-- NO ENCONTRADO -->
+        <div class="card" style="text-align: center; padding: 40px 24px; animation: fadeIn 0.3s ease;">
+          <span class="mi" style="font-size: 52px; color: #d1d5db; display: block; margin-bottom: 12px;">search_off</span>
+          <div style="font-size: 16px; font-weight: 700; color: #374151; margin-bottom: 8px;">Vehiculo no encontrado</div>
+          <div style="font-size: 13px; color: #9ca3af; margin-bottom: 6px;">
+            La placa <strong style="letter-spacing: 1px; font-family: monospace;">{{ searchResult()?.plate }}</strong> no esta registrada en el parqueadero en este momento.
+          </div>
+          <div style="font-size: 12px; color: #d1d5db; margin-bottom: 24px;">Verifica la placa e intenta de nuevo</div>
+          <button (click)="clearSearch()" class="btn btn-primary">Nueva busqueda</button>
+        </div>
+      }
+    }
+
+    @if (!searchDone() && !searchLoading()) {
+      <!-- Instrucciones + placas de ejemplo -->
+      <div class="card" style="padding: 20px;">
+        <div style="font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 12px;">Placas de prueba disponibles:</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          @for (p of ['EAF-123','MOT-456','UNI-321','EAF-555','PRF-001','MOT-888']; track p) {
+            <button (click)="searchPlate.set(p); searchVehicle()"
+                    style="padding: 8px 14px; border-radius: 10px; border: 2px solid #e5e7eb; background: white; font-size: 13px; font-weight: 700; letter-spacing: 1px; font-family: monospace; cursor: pointer; color: #000066; transition: all 0.2s;">
+              {{ p }}
+            </button>
+          }
+        </div>
+        <div style="margin-top: 14px; padding: 12px 14px; background: #f0f7ff; border-radius: 12px; display: flex; gap: 10px; align-items: flex-start;">
+          <span class="mi" style="font-size: 18px; color: #3b82f6; flex-shrink: 0; margin-top: 1px;">info</span>
+          <span style="font-size: 12px; color: #1e40af; line-height: 1.5;">El sistema usa LPR (reconocimiento de placas) para registrar automaticamente cuando tu vehiculo entra y asignarle una celda.</span>
+        </div>
+      </div>
+    }
+  }
+
+</div>
+
+<!-- Modal camara ampliada -->
+@if (selectedCamera(); as cam) {
+  <div style="position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,0.9); display: flex; flex-direction: column;" (click)="selectedCamera.set(null)">
+    <div style="padding: 16px; display: flex; align-items: center; justify-content: space-between;" (click)="$event.stopPropagation()">
+      <div>
+        <div style="font-size: 16px; font-weight: 800; color: white;">{{ cam.name }}</div>
+        <div style="font-size: 12px; color: rgba(255,255,255,0.5);">{{ cam.location }}</div>
+      </div>
+      <button (click)="selectedCamera.set(null)" style="width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(255,255,255,0.1); cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        <span class="mi" style="font-size: 20px; color: white;">close</span>
+      </button>
+    </div>
+
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 16px;" (click)="$event.stopPropagation()">
+      <div style="width: 100%; max-width: 700px; position: relative;">
+        <img [src]="cam.imageUrl" [alt]="cam.name" style="width: 100%; border-radius: 16px; display: block;" />
+        @if (cam.status === 'live') {
+          <div style="position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.7); padding: 6px 12px; border-radius: 20px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444; animation: pulse 1s infinite;"></span>
+            <span style="font-size: 12px; font-weight: 800; color: white; letter-spacing: 1px;">EN VIVO</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div style="padding: 16px; display: flex; gap: 10px;" (click)="$event.stopPropagation()">
+      <div style="flex: 1; background: rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; text-align: center;">
+        <span class="mi" style="font-size: 20px; color: white; display: block;">{{ cam.vehicleType === 'car' ? 'directions_car' : 'two_wheeler' }}</span>
+        <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px;">Tipo</div>
+        <div style="font-size: 13px; font-weight: 700; color: white;">{{ cam.vehicleType === 'car' ? 'Carros' : 'Motos' }}</div>
+      </div>
+      <div style="flex: 1; background: rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; text-align: center;">
+        <span class="mi" style="font-size: 20px; color: white; display: block;">sensor_door</span>
+        <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px;">Entrada</div>
+        <div style="font-size: 13px; font-weight: 700; color: white;">No. {{ cam.entrance }}</div>
+      </div>
+      <div style="flex: 1; background: rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; text-align: center;">
+        <span class="mi" style="font-size: 20px; color: #4ade80; display: block;">document_scanner</span>
+        <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px;">Detecciones</div>
+        <div style="font-size: 13px; font-weight: 700; color: white;">{{ cam.detections }}</div>
+      </div>
+    </div>
+  </div>
+}

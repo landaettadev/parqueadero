@@ -21,15 +21,30 @@ export class DashboardComponent implements OnInit {
   router = inject(Router);
 
   zones = this.parkingService.zones;
+  carZones = this.parkingService.carZones;
+  motoZones = this.parkingService.motoZones;
   totalAvailability = this.parkingService.totalAvailability;
+  carAvailability = this.parkingService.carAvailability;
+  motoAvailability = this.parkingService.motoAvailability;
   isLoading = this.parkingService.isLoading;
   activeReservation = this.reservationService.activeReservation;
   defaultVehicle = this.vehicleService.defaultVehicle;
   queueSize = this.queueService.queueSize;
 
+  readonly Math = Math;
+
   occupancyPercentage = computed(() => {
-    const total = this.totalAvailability().total;
-    const occupied = this.totalAvailability().occupied;
+    const { total, occupied } = this.totalAvailability();
+    return total > 0 ? Math.round((occupied / total) * 100) : 0;
+  });
+
+  carOccupancyPct = computed(() => {
+    const { total, occupied } = this.carAvailability();
+    return total > 0 ? Math.round((occupied / total) * 100) : 0;
+  });
+
+  motoOccupancyPct = computed(() => {
+    const { total, occupied } = this.motoAvailability();
     return total > 0 ? Math.round((occupied / total) * 100) : 0;
   });
 
@@ -42,7 +57,6 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.parkingService.loadZones().subscribe();
-    this.parkingService.loadTotalAvailability().subscribe();
     this.parkingService.subscribeToRealtimeUpdates();
   }
 

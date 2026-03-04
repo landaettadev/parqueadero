@@ -6,6 +6,8 @@ export interface ParkingZone {
   occupiedSpots: number;
   availableSpots: number;
   status?: 'available' | 'limited' | 'full';
+  vehicleType: 'car' | 'motorcycle';
+  entrance: number;
   latitude?: number;
   longitude?: number;
   location?: { lat: number; lng: number };
