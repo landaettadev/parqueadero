@@ -83,8 +83,6 @@ export class AdminDashboardComponent implements OnInit {
   ngOnInit(): void {
     // Cargar datos
     this.parkingService.loadZones().subscribe();
-    this.parkingService.loadTotalAvailability().subscribe();
-    this.queueService.loadQueue().subscribe();
     
     // Suscribirse a actualizaciones en tiempo real
     this.parkingService.subscribeToRealtimeUpdates();

@@ -1,86 +1,193 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { QueueEntry } from '@domain/entities/queue-entry.entity';
+
+export interface EntranceQueue {
+  entranceId: string;
+  entrance: number;
+  vehicleType: 'car' | 'motorcycle';
+  name: string;
+  location: string;
+  queue: QueueEntry[];
+  isOpen: boolean;
+}
+
+export interface UserQueueStatus {
+  entranceId: string;
+  position: number;
+  estimatedWaitMinutes: number;
+  joinedAt: Date;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class QueueService {
-  // Datos mock
-  private mockQueue: QueueEntry[] = [
-    { id: '1', userId: 'user-1', position: 1, joinedAt: new Date(), estimatedWaitMinutes: 5, status: 'WAITING' },
-    { id: '2', userId: 'user-2', position: 2, joinedAt: new Date(), estimatedWaitMinutes: 10, status: 'WAITING' },
-    { id: '3', userId: 'user-3', position: 3, joinedAt: new Date(), estimatedWaitMinutes: 15, status: 'WAITING' },
+
+  // Cola por entrada — 6 carros + 3 motos
+  private _entranceQueues: EntranceQueue[] = [
+    {
+      entranceId: 'car-1', entrance: 1, vehicleType: 'car',
+      name: 'Entrada 1 — Carros', location: 'Edificio Ingenierías (Bloque 18)',
+      isOpen: true,
+      queue: [
+        { id: 'c1u1', userId: 'user-a', position: 1, joinedAt: new Date(Date.now() - 8 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
+        { id: 'c1u2', userId: 'user-b', position: 2, joinedAt: new Date(Date.now() - 6 * 60000), estimatedWaitMinutes: 10, status: 'WAITING' },
+        { id: 'c1u3', userId: 'user-c', position: 3, joinedAt: new Date(Date.now() - 4 * 60000), estimatedWaitMinutes: 15, status: 'WAITING' },
+      ]
+    },
+    {
+      entranceId: 'car-2', entrance: 2, vehicleType: 'car',
+      name: 'Entrada 2 — Carros', location: 'Biblioteca (Bloque 20)',
+      isOpen: true,
+      queue: [
+        { id: 'c2u1', userId: 'user-d', position: 1, joinedAt: new Date(Date.now() - 3 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
+      ]
+    },
+    {
+      entranceId: 'car-3', entrance: 3, vehicleType: 'car',
+      name: 'Entrada 3 — Carros', location: 'Bloque Ciencias (Bloque 32)',
+      isOpen: true,
+      queue: [
+        { id: 'c3u1', userId: 'user-e', position: 1, joinedAt: new Date(Date.now() - 12 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
+        { id: 'c3u2', userId: 'user-f', position: 2, joinedAt: new Date(Date.now() - 9 * 60000), estimatedWaitMinutes: 10, status: 'WAITING' },
+        { id: 'c3u3', userId: 'user-g', position: 3, joinedAt: new Date(Date.now() - 6 * 60000), estimatedWaitMinutes: 15, status: 'WAITING' },
+        { id: 'c3u4', userId: 'user-h', position: 4, joinedAt: new Date(Date.now() - 3 * 60000), estimatedWaitMinutes: 20, status: 'WAITING' },
+        { id: 'c3u5', userId: 'user-i', position: 5, joinedAt: new Date(Date.now() - 1 * 60000), estimatedWaitMinutes: 25, status: 'WAITING' },
+      ]
+    },
+    {
+      entranceId: 'car-4', entrance: 4, vehicleType: 'car',
+      name: 'Entrada 4 — Carros', location: 'Deportivo Sur (Bloque 44)',
+      isOpen: false,
+      queue: []
+    },
+    {
+      entranceId: 'car-5', entrance: 5, vehicleType: 'car',
+      name: 'Entrada 5 — Carros', location: 'Visitantes (Av. El Poblado)',
+      isOpen: true,
+      queue: [
+        { id: 'c5u1', userId: 'user-j', position: 1, joinedAt: new Date(Date.now() - 5 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
+        { id: 'c5u2', userId: 'user-k', position: 2, joinedAt: new Date(Date.now() - 2 * 60000), estimatedWaitMinutes: 10, status: 'WAITING' },
+      ]
+    },
+    {
+      entranceId: 'car-6', entrance: 6, vehicleType: 'car',
+      name: 'Entrada 6 — Carros', location: 'Posgrados (Bloque 38)',
+      isOpen: true,
+      queue: []
+    },
+    {
+      entranceId: 'moto-1', entrance: 1, vehicleType: 'motorcycle',
+      name: 'Entrada 1 — Motos', location: 'Costado Ingenierías',
+      isOpen: true,
+      queue: [
+        { id: 'm1u1', userId: 'user-l', position: 1, joinedAt: new Date(Date.now() - 4 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
+        { id: 'm1u2', userId: 'user-m', position: 2, joinedAt: new Date(Date.now() - 2 * 60000), estimatedWaitMinutes: 10, status: 'WAITING' },
+      ]
+    },
+    {
+      entranceId: 'moto-2', entrance: 2, vehicleType: 'motorcycle',
+      name: 'Entrada 2 — Motos', location: 'Costado Biblioteca',
+      isOpen: true,
+      queue: [
+        { id: 'm2u1', userId: 'user-n', position: 1, joinedAt: new Date(Date.now() - 7 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
+        { id: 'm2u2', userId: 'user-o', position: 2, joinedAt: new Date(Date.now() - 5 * 60000), estimatedWaitMinutes: 10, status: 'WAITING' },
+        { id: 'm2u3', userId: 'user-p', position: 3, joinedAt: new Date(Date.now() - 3 * 60000), estimatedWaitMinutes: 15, status: 'WAITING' },
+      ]
+    },
+    {
+      entranceId: 'moto-3', entrance: 3, vehicleType: 'motorcycle',
+      name: 'Entrada 3 — Motos', location: 'Deportivo Sur',
+      isOpen: true,
+      queue: []
+    },
   ];
 
   // Signals
-  queue = signal<QueueEntry[]>(this.mockQueue);
-  userPosition = signal<QueueEntry | null>(null);
+  entranceQueues = signal<EntranceQueue[]>(this._entranceQueues);
+  userQueueStatus = signal<UserQueueStatus | null>(null);
   isLoading = signal(false);
 
-  // Computed
-  queueSize = computed(() => this.queue().length);
-  isInQueue = computed(() => this.userPosition() !== null);
-  estimatedWaitTime = computed(() => {
-    const position = this.userPosition();
-    return position ? position.estimatedWaitMinutes : 0;
+  // Compat signals (usados por dashboard y otros componentes)
+  queue = computed(() => {
+    const status = this.userQueueStatus();
+    if (!status) return [];
+    const entrance = this.entranceQueues().find(e => e.entranceId === status.entranceId);
+    return entrance?.queue ?? [];
   });
 
-  /**
-   * Obtener toda la cola (mock)
-   */
-  loadQueue(): Observable<QueueEntry[]> {
-    this.isLoading.set(true);
-    setTimeout(() => {
-      this.queue.set(this.mockQueue);
-      this.isLoading.set(false);
-    }, 300);
-    return of(this.mockQueue);
-  }
+  userPosition = computed(() => {
+    const status = this.userQueueStatus();
+    if (!status) return null;
+    return {
+      id: 'me',
+      userId: 'user-demo-123',
+      position: status.position,
+      joinedAt: status.joinedAt,
+      estimatedWaitMinutes: status.estimatedWaitMinutes,
+      status: 'WAITING' as const
+    };
+  });
 
-  /**
-   * Obtener posición del usuario en la cola (mock)
-   */
-  loadUserPosition(userId: string): Observable<QueueEntry | null> {
-    return of(this.userPosition());
-  }
+  isInQueue = computed(() => this.userQueueStatus() !== null);
+  queueSize = computed(() => {
+    return this._entranceQueues.reduce((sum, e) => sum + e.queue.length, 0);
+  });
 
-  /**
-   * Unirse a la cola (mock)
-   */
-  joinQueue(userId: string): Observable<QueueEntry> {
-    this.isLoading.set(true);
-    const newEntry: QueueEntry = {
+  estimatedWaitTime = computed(() => this.userQueueStatus()?.estimatedWaitMinutes ?? 0);
+
+  getCarQueues = computed(() => this.entranceQueues().filter(e => e.vehicleType === 'car'));
+  getMotoQueues = computed(() => this.entranceQueues().filter(e => e.vehicleType === 'motorcycle'));
+
+  joinQueue(userId: string, entranceId: string): Observable<UserQueueStatus> {
+    const queues = [...this._entranceQueues];
+    const idx = queues.findIndex(e => e.entranceId === entranceId);
+    if (idx === -1) return of(this.userQueueStatus()!);
+
+    const pos = queues[idx].queue.length + 1;
+    const entry: QueueEntry = {
       id: userId,
-      userId: userId,
-      position: this.mockQueue.length + 1,
+      userId,
+      position: pos,
       joinedAt: new Date(),
-      estimatedWaitMinutes: (this.mockQueue.length + 1) * 5,
+      estimatedWaitMinutes: pos * 5,
       status: 'WAITING'
     };
-    this.mockQueue.push(newEntry);
-    this.userPosition.set(newEntry);
-    this.queue.set([...this.mockQueue]);
-    this.isLoading.set(false);
-    return of(newEntry);
+    queues[idx] = { ...queues[idx], queue: [...queues[idx].queue, entry] };
+    this._entranceQueues = queues;
+    this.entranceQueues.set([...queues]);
+
+    const status: UserQueueStatus = {
+      entranceId,
+      position: pos,
+      estimatedWaitMinutes: pos * 5,
+      joinedAt: new Date()
+    };
+    this.userQueueStatus.set(status);
+    return of(status);
   }
 
-  /**
-   * Salir de la cola (mock)
-   */
   leaveQueue(userId: string): Observable<void> {
-    this.isLoading.set(true);
-    this.mockQueue = this.mockQueue.filter(e => e.id !== userId);
-    this.userPosition.set(null);
-    this.queue.set([...this.mockQueue]);
-    this.isLoading.set(false);
+    const status = this.userQueueStatus();
+    if (!status) return of(void 0);
+
+    const queues = [...this._entranceQueues];
+    const idx = queues.findIndex(e => e.entranceId === status.entranceId);
+    if (idx !== -1) {
+      queues[idx] = { ...queues[idx], queue: queues[idx].queue.filter(e => e.userId !== userId) };
+      this._entranceQueues = queues;
+      this.entranceQueues.set([...queues]);
+    }
+    this.userQueueStatus.set(null);
     return of(void 0);
   }
 
-  /**
-   * Suscribirse a actualizaciones en tiempo real (mock)
-   */
   subscribeToRealtimeUpdates(userId: string): void {
     this.isLoading.set(false);
+  }
+
+  getEntranceById(id: string): EntranceQueue | undefined {
+    return this.entranceQueues().find(e => e.entranceId === id);
   }
 }

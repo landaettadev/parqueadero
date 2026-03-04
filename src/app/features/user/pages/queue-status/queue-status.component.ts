@@ -1,7 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { QueueService } from '@application/services/queue.service';
-import { LABELS } from '@shared/constants/labels.constants';
+import { QueueService, EntranceQueue } from '@application/services/queue.service';
 
 @Component({
   standalone: true,
@@ -13,62 +12,72 @@ import { LABELS } from '@shared/constants/labels.constants';
 export class QueueStatusComponent implements OnInit {
   private queueService = inject(QueueService);
 
-  readonly labels = LABELS;
   readonly Math = Math;
-  
-  // Mock user ID - en producción vendría del AuthService
   private readonly mockUserId = 'user-demo-123';
 
   // Signals del servicio
-  queue = this.queueService.queue;
-  userPosition = this.queueService.userPosition;
-  isLoading = this.queueService.isLoading;
+  entranceQueues = this.queueService.entranceQueues;
+  carQueues = this.queueService.getCarQueues;
+  motoQueues = this.queueService.getMotoQueues;
+  userQueueStatus = this.queueService.userQueueStatus;
   isInQueue = this.queueService.isInQueue;
-  estimatedWaitTime = this.queueService.estimatedWaitTime;
-  queueSize = this.queueService.queueSize;
+  isLoading = this.queueService.isLoading;
 
-  // Local signals
+  // Local
   showConfirmLeave = signal(false);
+  selectedEntrance = signal<EntranceQueue | null>(null);
+  vehicleFilter = signal<'all' | 'car' | 'motorcycle'>('all');
+
+  currentEntrance = computed(() => {
+    const status = this.userQueueStatus();
+    if (!status) return null;
+    return this.queueService.getEntranceById(status.entranceId) ?? null;
+  });
+
+  progressPercentage = computed(() => {
+    const status = this.userQueueStatus();
+    const entrance = this.currentEntrance();
+    if (!status || !entrance) return 0;
+    const total = entrance.queue.length;
+    return total > 0 ? ((total - status.position + 1) / total) * 100 : 0;
+  });
+
+  filteredQueues = computed(() => {
+    const f = this.vehicleFilter();
+    return f === 'all'
+      ? this.entranceQueues()
+      : this.entranceQueues().filter(e => e.vehicleType === f);
+  });
+
+  totalCarQueueSize = computed(() => this.carQueues().reduce((s, e) => s + e.queue.length, 0));
+  totalMotoQueueSize = computed(() => this.motoQueues().reduce((s, e) => s + e.queue.length, 0));
 
   ngOnInit(): void {
     this.queueService.subscribeToRealtimeUpdates(this.mockUserId);
   }
 
-  joinQueue(): void {
-    this.queueService.joinQueue(this.mockUserId).subscribe({
-      next: () => {
-        console.log('Joined queue successfully');
-      },
-      error: (error) => {
-        console.error('Error joining queue:', error);
-      }
-    });
-  }
-
-  confirmLeaveQueue(): void {
-    this.showConfirmLeave.set(true);
-  }
-
-  cancelLeave(): void {
-    this.showConfirmLeave.set(false);
+  joinQueue(entrance: EntranceQueue): void {
+    this.queueService.joinQueue(this.mockUserId, entrance.entranceId).subscribe();
+    this.selectedEntrance.set(null);
   }
 
   leaveQueue(): void {
-    this.queueService.leaveQueue(this.mockUserId).subscribe({
-      next: () => {
-        this.showConfirmLeave.set(false);
-        console.log('Left queue successfully');
-      },
-      error: (error) => {
-        console.error('Error leaving queue:', error);
-      }
+    this.queueService.leaveQueue(this.mockUserId).subscribe(() => {
+      this.showConfirmLeave.set(false);
     });
   }
 
-  getProgressPercentage(): number {
-    const position = this.userPosition();
-    if (!position) return 0;
-    const total = this.queueSize();
-    return total > 0 ? ((total - position.position + 1) / total) * 100 : 0;
+  getQueueColor(size: number, isOpen: boolean): string {
+    if (!isOpen) return '#9ca3af';
+    if (size === 0) return '#10b981';
+    if (size <= 2) return '#f59e0b';
+    return '#ef4444';
+  }
+
+  getQueueLabel(size: number, isOpen: boolean): string {
+    if (!isOpen) return 'Cerrada';
+    if (size === 0) return 'Sin cola';
+    if (size <= 2) return `${size} en cola`;
+    return `${size} en cola`;
   }
 }

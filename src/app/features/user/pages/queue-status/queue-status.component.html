@@ -1,93 +1,222 @@
 ﻿<div class="page">
   <h1 class="page-title">Cola de Espera</h1>
-  <p class="page-subtitle">Gestiona tu posicion en la cola</p>
+  <p class="page-subtitle">Gestiona tu turno por entrada</p>
 
   @if (isLoading()) {
     <div style="display: flex; justify-content: center; padding: 60px 0;">
       <div style="width: 48px; height: 48px; border: 4px solid #e5e7eb; border-top-color: #000066; border-radius: 50%; animation: spin 1s linear infinite;"></div>
     </div>
   } @else {
+
+    <!-- ===== EN COLA  banner activo ===== -->
     @if (isInQueue()) {
-      <!-- In Queue -->
-      <div class="card gradient-info" style="margin-bottom: 20px; padding: 28px; text-align: center;">
-        <div style="font-size: 13px; opacity: 0.8; margin-bottom: 8px;">Tu posicion</div>
-        <div style="font-size: 64px; font-weight: 900; letter-spacing: -2px; line-height: 1;">#{{ userPosition()!.position }}</div>
-        <div style="font-size: 14px; opacity: 0.8; margin-top: 8px;">de {{ queueSize() }} personas</div>
+      <!-- Banner de posicion -->
+      <div style="background: linear-gradient(135deg, #000033, #000066); border-radius: 20px; padding: 24px; margin-bottom: 16px; color: white;">
+        <div style="font-size: 12px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Tu posicion en cola</div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="font-size: 72px; font-weight: 900; line-height: 1; letter-spacing: -3px;">#{{ userQueueStatus()!.position }}</div>
+          <div>
+            <div style="font-size: 16px; font-weight: 800;">{{ currentEntrance()?.name }}</div>
+            <div style="font-size: 13px; opacity: 0.7; margin-top: 2px;">{{ currentEntrance()?.location }}</div>
+          </div>
+        </div>
       </div>
 
       <!-- Stats -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-        <div class="stat-card">
-          <div class="stat-label">Tiempo estimado</div>
-          <div class="stat-value" style="font-size: 28px; color: #000066;">~{{ estimatedWaitTime() }}m</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+        <div class="stat-card" style="text-align: center;">
+          <div class="stat-value" style="font-size: 22px; color: #000066;">~{{ userQueueStatus()!.estimatedWaitMinutes }}m</div>
+          <div class="stat-label">Espera</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Adelante de ti</div>
-          <div class="stat-value" style="font-size: 28px; color: #6b7280;">{{ userPosition()!.position - 1 }}</div>
+        <div class="stat-card" style="text-align: center;">
+          <div class="stat-value" style="font-size: 22px; color: #6b7280;">{{ userQueueStatus()!.position - 1 }}</div>
+          <div class="stat-label">Adelante</div>
+        </div>
+        <div class="stat-card" style="text-align: center;">
+          <div class="stat-value" style="font-size: 22px; color: #6b7280;">{{ currentEntrance()?.queue?.length ?? 0 }}</div>
+          <div class="stat-label">Total cola</div>
         </div>
       </div>
 
-      <!-- Progress -->
-      <div class="card" style="margin-bottom: 20px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-          <span style="font-size: 14px; font-weight: 600; color: #1a1a2e;">Progreso</span>
-          <span style="font-size: 14px; font-weight: 700; color: #000066;">{{ Math.round(getProgressPercentage()) }}%</span>
+      <!-- Progreso -->
+      <div class="card" style="margin-bottom: 16px; padding: 18px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <span style="font-size: 14px; font-weight: 600; color: #1a1a2e;">Progreso en cola</span>
+          <span style="font-size: 14px; font-weight: 700; color: #000066;">{{ Math.round(progressPercentage()) }}%</span>
         </div>
-        <div class="progress-bar" style="height: 12px;">
-          <div class="progress-fill" [style.width.%]="getProgressPercentage()" style="background: #3b82f6;"></div>
+        <div class="progress-bar" style="height: 10px;">
+          <div class="progress-fill" [style.width.%]="progressPercentage()" style="background: #3b82f6;"></div>
         </div>
-        <div style="font-size: 13px; color: #9ca3af; margin-top: 12px; text-align: center;">
-          <span class="mi" style="font-size: 16px; vertical-align: middle;">notifications_active</span>
+        <div style="font-size: 12px; color: #9ca3af; margin-top: 10px; text-align: center;">
+          <span class="mi" style="font-size: 15px; vertical-align: middle;">notifications_active</span>
           Te notificaremos cuando sea tu turno
         </div>
       </div>
 
-      <!-- Leave Queue -->
-      <button (click)="confirmLeaveQueue()" class="btn btn-danger btn-block btn-lg">
+      <button (click)="showConfirmLeave.set(true)"
+              style="width: 100%; padding: 16px; border-radius: 14px; border: 2px solid #ef4444; background: #fef2f2; color: #ef4444; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px;">
         <span class="mi" style="font-size: 20px;">logout</span>
-        Salir de la Cola
+        Salir de la cola
       </button>
 
-      <!-- Confirm Modal -->
+      <!-- Confirm modal -->
       @if (showConfirmLeave()) {
-        <div style="position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: 16px;" (click)="cancelLeave()">
+        <div style="position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: 16px;" (click)="showConfirmLeave.set(false)">
           <div class="card" style="max-width: 360px; width: 100%; text-align: center; animation: fadeIn 0.2s ease;" (click)="$event.stopPropagation()">
-            <span class="mi" style="font-size: 56px; color: #ef4444;">warning</span>
+            <span class="mi" style="font-size: 52px; color: #ef4444;">warning</span>
             <h3 style="font-size: 20px; font-weight: 700; margin: 12px 0 8px;">Salir de la cola?</h3>
-            <p style="font-size: 14px; color: #6b7280; margin: 0 0 20px;">Perderas tu posicion #{{ userPosition()!.position }}</p>
+            <p style="font-size: 14px; color: #6b7280; margin: 0 0 20px;">Perderas tu posicion #{{ userQueueStatus()!.position }} en {{ currentEntrance()?.name }}</p>
             <div style="display: flex; gap: 12px;">
-              <button (click)="cancelLeave()" class="btn btn-ghost" style="flex: 1;">Cancelar</button>
-              <button (click)="leaveQueue()" class="btn btn-danger" style="flex: 1;">Salir</button>
+              <button (click)="showConfirmLeave.set(false)"
+                      style="flex: 1; padding: 14px; border-radius: 12px; border: 2px solid #e5e7eb; background: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; color: #374151;">Cancelar</button>
+              <button (click)="leaveQueue()"
+                      style="flex: 1; padding: 14px; border-radius: 12px; border: none; background: #ef4444; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;">Salir</button>
             </div>
           </div>
         </div>
       }
+
     } @else {
-      <!-- Not in Queue -->
-      <div class="card" style="text-align: center; padding: 40px 24px; margin-bottom: 20px;">
-        <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(59,130,246,0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-          <span class="mi" style="font-size: 40px; color: #3b82f6;">groups</span>
-        </div>
-        <h2 style="font-size: 22px; font-weight: 800; color: #1a1a2e; margin: 0 0 8px;">No estas en la cola</h2>
-        <p style="font-size: 14px; color: #6b7280; margin: 0 0 24px;">Unete para ser notificado cuando haya espacio disponible</p>
+      <!-- ===== NO EN COLA  ver entradas ===== -->
 
-        <!-- Queue Info -->
-        <div style="display: flex; gap: 12px; margin-bottom: 24px;">
-          <div class="stat-card" style="flex: 1; text-align: center;">
-            <div class="stat-value" style="font-size: 28px; color: #3b82f6;">{{ queueSize() }}</div>
-            <div class="stat-label">En cola</div>
+      <!-- Resumen global -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+        <div class="card" style="text-align: center; padding: 16px;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 6px;">
+            <span class="mi" style="font-size: 20px; color: #000066;">directions_car</span>
+            <span style="font-size: 12px; font-weight: 700; color: #6b7280;">6 ENTRADAS</span>
           </div>
-          <div class="stat-card" style="flex: 1; text-align: center;">
-            <div class="stat-value" style="font-size: 28px; color: #6b7280;">~{{ queueSize() * 5 }}m</div>
-            <div class="stat-label">Espera est.</div>
-          </div>
+          <div style="font-size: 26px; font-weight: 900; color: #000066;">{{ totalCarQueueSize() }}</div>
+          <div style="font-size: 11px; color: #9ca3af;">personas en cola</div>
         </div>
+        <div class="card" style="text-align: center; padding: 16px;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 6px;">
+            <span class="mi" style="font-size: 20px; color: #8b5cf6;">two_wheeler</span>
+            <span style="font-size: 12px; font-weight: 700; color: #6b7280;">3 ENTRADAS</span>
+          </div>
+          <div style="font-size: 26px; font-weight: 900; color: #8b5cf6;">{{ totalMotoQueueSize() }}</div>
+          <div style="font-size: 11px; color: #9ca3af;">personas en cola</div>
+        </div>
+      </div>
 
-        <button (click)="joinQueue()" [disabled]="isLoading()" class="btn btn-primary btn-block btn-lg">
-          <span class="mi" style="font-size: 20px;">add_circle</span>
-          Unirme a la Cola
-        </button>
+      <!-- Filtro -->
+      <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        @for (f of [{v:'all',l:'Todas'},{v:'car',l:'Carros'},{v:'motorcycle',l:'Motos'}]; track f.v) {
+          <button (click)="vehicleFilter.set($any(f.v))"
+                  style="padding: 7px 16px; border-radius: 20px; border: 1.5px solid; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; transition: all 0.2s;"
+                  [style.borderColor]="vehicleFilter() === f.v ? '#000066' : '#e5e7eb'"
+                  [style.background]="vehicleFilter() === f.v ? 'rgba(0,0,102,0.08)' : 'white'"
+                  [style.color]="vehicleFilter() === f.v ? '#000066' : '#6b7280'">{{ f.l }}</button>
+        }
+      </div>
+
+      <!-- Lista de entradas -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        @for (entrance of filteredQueues(); track entrance.entranceId) {
+          <div class="card" style="padding: 16px 18px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <!-- Icono tipo -->
+              <div style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                   [style.background]="entrance.vehicleType === 'car' ? 'rgba(0,0,102,0.08)' : 'rgba(139,92,246,0.1)'">
+                <span class="mi" style="font-size: 22px;"
+                      [style.color]="entrance.vehicleType === 'car' ? '#000066' : '#8b5cf6'">
+                  {{ entrance.vehicleType === 'car' ? 'directions_car' : 'two_wheeler' }}
+                </span>
+              </div>
+
+              <!-- Info -->
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 14px; font-weight: 700; color: #1a1a2e;">{{ entrance.name }}</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ entrance.location }}</div>
+                <div style="margin-top: 6px;">
+                  <span style="font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 8px;"
+                        [style.background]="getQueueColor(entrance.queue.length, entrance.isOpen) + '20'"
+                        [style.color]="getQueueColor(entrance.queue.length, entrance.isOpen)">
+                    {{ getQueueLabel(entrance.queue.length, entrance.isOpen) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Accion -->
+              @if (entrance.isOpen) {
+                <button (click)="selectedEntrance.set(entrance)"
+                        style="padding: 10px 16px; border-radius: 12px; border: none; background: #000066; color: white; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; flex-shrink: 0;">
+                  Unirse
+                </button>
+              } @else {
+                <span style="font-size: 12px; color: #9ca3af; flex-shrink: 0;">No disponible</span>
+              }
+            </div>
+
+            <!-- Mini queue preview -->
+            @if (entrance.queue.length > 0) {
+              <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #f3f4f6;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  @for (item of entrance.queue.slice(0, 5); track item.id) {
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,102,0.08); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #000066;">
+                      {{ item.position }}
+                    </div>
+                  }
+                  @if (entrance.queue.length > 5) {
+                    <span style="font-size: 11px; color: #9ca3af;">+{{ entrance.queue.length - 5 }} mas</span>
+                  }
+                  <span style="font-size: 11px; color: #9ca3af; margin-left: 4px;"> ~{{ entrance.queue.length * 5 }} min espera</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
       </div>
     }
   }
 </div>
+
+<!-- ===== MODAL CONFIRMAR UNIRSE ===== -->
+@if (selectedEntrance(); as entrance) {
+  <div style="position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); display: flex; align-items: flex-end; justify-content: center; padding: 16px;"
+       (click)="selectedEntrance.set(null)">
+    <div class="card" style="max-width: 480px; width: 100%; animation: slideUp 0.25s ease;" (click)="$event.stopPropagation()">
+      <!-- Header -->
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+        <div style="width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center;"
+             [style.background]="entrance.vehicleType === 'car' ? 'rgba(0,0,102,0.08)' : 'rgba(139,92,246,0.1)'">
+          <span class="mi" style="font-size: 26px;"
+                [style.color]="entrance.vehicleType === 'car' ? '#000066' : '#8b5cf6'">
+            {{ entrance.vehicleType === 'car' ? 'directions_car' : 'two_wheeler' }}
+          </span>
+        </div>
+        <div>
+          <div style="font-size: 17px; font-weight: 800; color: #1a1a2e;">{{ entrance.name }}</div>
+          <div style="font-size: 13px; color: #9ca3af;">{{ entrance.location }}</div>
+        </div>
+      </div>
+
+      <!-- Resumen -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+        <div style="background: #f8fafc; border-radius: 12px; padding: 14px; text-align: center;">
+          <div style="font-size: 22px; font-weight: 900; color: #1a1a2e;">{{ entrance.queue.length + 1 }}</div>
+          <div style="font-size: 12px; color: #9ca3af; margin-top: 2px;">Tu posicion</div>
+        </div>
+        <div style="background: #f8fafc; border-radius: 12px; padding: 14px; text-align: center;">
+          <div style="font-size: 22px; font-weight: 900; color: #1a1a2e;">~{{ (entrance.queue.length + 1) * 5 }}m</div>
+          <div style="font-size: 12px; color: #9ca3af; margin-top: 2px;">Espera estimada</div>
+        </div>
+      </div>
+
+      <div style="font-size: 13px; color: #6b7280; background: #f0f7ff; border-radius: 12px; padding: 12px 14px; margin-bottom: 20px; display: flex; gap: 8px; align-items: flex-start;">
+        <span class="mi" style="font-size: 18px; color: #3b82f6; flex-shrink: 0;">info</span>
+        <span>Recibirás una notificación cuando puedas ingresar. Puedes salir de la cola en cualquier momento.</span>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button (click)="selectedEntrance.set(null)"
+                style="flex: 1; padding: 15px; border-radius: 14px; border: 2px solid #e5e7eb; background: white; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; color: #374151;">Cancelar</button>
+        <button (click)="joinQueue(entrance)"
+                style="flex: 2; padding: 15px; border-radius: 14px; border: none; background: #000066; color: white; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;">
+          <span class="mi" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">add_circle</span>
+          Unirme a la cola
+        </button>
+      </div>
+    </div>
+  </div>
+}
