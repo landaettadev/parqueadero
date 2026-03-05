@@ -2,7 +2,6 @@ import { Component, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ParkingService } from '@application/services/parking.service';
-import { ReservationService } from '@application/services/reservation.service';
 import { VehicleService } from '@application/services/vehicle.service';
 import { QueueService } from '@application/services/queue.service';
 
@@ -15,7 +14,6 @@ import { QueueService } from '@application/services/queue.service';
 })
 export class DashboardComponent implements OnInit {
   private parkingService = inject(ParkingService);
-  private reservationService = inject(ReservationService);
   private vehicleService = inject(VehicleService);
   private queueService = inject(QueueService);
   router = inject(Router);
@@ -27,7 +25,7 @@ export class DashboardComponent implements OnInit {
   carAvailability = this.parkingService.carAvailability;
   motoAvailability = this.parkingService.motoAvailability;
   isLoading = this.parkingService.isLoading;
-  activeReservation = this.reservationService.activeReservation;
+  vehicles = this.vehicleService.vehicles;
   defaultVehicle = this.vehicleService.defaultVehicle;
   queueSize = this.queueService.queueSize;
 

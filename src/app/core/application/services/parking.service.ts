@@ -10,57 +10,57 @@ export class ParkingService {
   private mockZones: ParkingZone[] = [
     // === CARROS — 6 entradas ===
     {
-      id: 'car-1', name: 'Parqueadero 1 — Carros', entrance: 1,
-      description: 'Entrada 1 · Edificio de Ingenierías (Bloque 18)',
+      id: 'car-1', name: 'Entrada 1 — Las Vegas', entrance: 1,
+      description: 'Entrada 1 · Las Vegas',
       vehicleType: 'car', totalSpots: 100, occupiedSpots: 80, availableSpots: 20,
       status: 'available', location: { lat: 6.2006, lng: -75.5783 }
     },
     {
-      id: 'car-2', name: 'Parqueadero 2 — Carros', entrance: 2,
-      description: 'Entrada 2 · Biblioteca (Bloque 20)',
+      id: 'car-2', name: 'Entrada 2 — Las Vegas (Empleados)', entrance: 2,
+      description: 'Entrada 2 · Las Vegas (Empleados)',
       vehicleType: 'car', totalSpots: 100, occupiedSpots: 60, availableSpots: 40,
       status: 'available', location: { lat: 6.2010, lng: -75.5790 }
     },
     {
-      id: 'car-3', name: 'Parqueadero 3 — Carros', entrance: 3,
-      description: 'Entrada 3 · Bloque de Ciencias (Bloque 32)',
+      id: 'car-3', name: 'Entrada 3 — Las Hermosas (Regional)', entrance: 3,
+      description: 'Entrada 3 · Las Hermosas (Regional)',
       vehicleType: 'car', totalSpots: 100, occupiedSpots: 95, availableSpots: 5,
       status: 'limited', location: { lat: 6.1998, lng: -75.5775 }
     },
     {
-      id: 'car-4', name: 'Parqueadero 4 — Carros', entrance: 4,
-      description: 'Entrada 4 · Deportivo Sur (Bloque 44)',
+      id: 'car-4', name: 'Entrada 4 — La Regional', entrance: 4,
+      description: 'Entrada 4 · La Regional',
       vehicleType: 'car', totalSpots: 100, occupiedSpots: 100, availableSpots: 0,
       status: 'full', location: { lat: 6.1995, lng: -75.5770 }
     },
     {
-      id: 'car-5', name: 'Parqueadero 5 — Carros', entrance: 5,
-      description: 'Entrada 5 · Visitantes Principal (Av. El Poblado)',
+      id: 'car-5', name: 'Entrada 5 — La Regional', entrance: 5,
+      description: 'Entrada 5 · La Regional',
       vehicleType: 'car', totalSpots: 100, occupiedSpots: 72, availableSpots: 28,
       status: 'available', location: { lat: 6.2014, lng: -75.5786 }
     },
     {
-      id: 'car-6', name: 'Parqueadero 6 — Carros', entrance: 6,
-      description: 'Entrada 6 · Posgrados (Bloque 38)',
+      id: 'car-6', name: 'Entrada 6 — Idiomas', entrance: 6,
+      description: 'Entrada 6 · Idiomas',
       vehicleType: 'car', totalSpots: 100, occupiedSpots: 50, availableSpots: 50,
       status: 'available', location: { lat: 6.2001, lng: -75.5780 }
     },
     // === MOTOS — 3 entradas ===
     {
-      id: 'moto-1', name: 'Parqueadero 1 — Motos', entrance: 1,
-      description: 'Entrada 1 · Costado Ingenierías',
+      id: 'moto-1', name: 'Entrada 1 — Las Vegas', entrance: 1,
+      description: 'Entrada 1 · Las Vegas',
       vehicleType: 'motorcycle', totalSpots: 80, occupiedSpots: 54, availableSpots: 26,
       status: 'available', location: { lat: 6.2007, lng: -75.5782 }
     },
     {
-      id: 'moto-2', name: 'Parqueadero 2 — Motos', entrance: 2,
-      description: 'Entrada 2 · Costado Biblioteca',
+      id: 'moto-2', name: 'Entrada 2 — La Regional', entrance: 2,
+      description: 'Entrada 2 · La Regional',
       vehicleType: 'motorcycle', totalSpots: 80, occupiedSpots: 78, availableSpots: 2,
       status: 'limited', location: { lat: 6.2011, lng: -75.5791 }
     },
     {
-      id: 'moto-3', name: 'Parqueadero 3 — Motos', entrance: 3,
-      description: 'Entrada 3 · Deportivo Sur',
+      id: 'moto-3', name: 'Entrada 3 — Idiomas', entrance: 3,
+      description: 'Entrada 3 · Idiomas',
       vehicleType: 'motorcycle', totalSpots: 80, occupiedSpots: 20, availableSpots: 60,
       status: 'available', location: { lat: 6.1996, lng: -75.5773 }
     }

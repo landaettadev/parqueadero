@@ -76,8 +76,7 @@ export class QueueStatusComponent implements OnInit {
 
   getQueueLabel(size: number, isOpen: boolean): string {
     if (!isOpen) return 'Cerrada';
-    if (size === 0) return 'Sin cola';
-    if (size <= 2) return `${size} en cola`;
-    return `${size} en cola`;
+    if (size === 0) return 'Sin espera';
+    return `${size} en espera`;
   }
 }

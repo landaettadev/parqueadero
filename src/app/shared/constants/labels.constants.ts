@@ -1,8 +1,8 @@
 export const LABELS = {
   APP_TITLE: 'Smart Parking EAFIT',
-  DASHBOARD: 'Dashboard',
+  DASHBOARD: 'Inicio',
   PARKING_MAP: 'Mapa de Parqueadero',
-  QUEUE_STATUS: 'Estado de Cola',
+  QUEUE_STATUS: 'Trafico',
   PREDICTION: 'Predicción IA',
   HISTORY: 'Historial',
   ADMIN_DASHBOARD: 'Panel Administrativo',
@@ -17,8 +17,8 @@ export const LABELS = {
   FULL: 'Lleno',
   
   // Actions
-  JOIN_QUEUE: 'Unirme a la Cola',
-  LEAVE_QUEUE: 'Salir de la Cola',
+  JOIN_QUEUE: 'Unirme a espera',
+  LEAVE_QUEUE: 'Salir de espera',
   LOGIN: 'Iniciar Sesión',
   LOGOUT: 'Cerrar Sesión'
 };

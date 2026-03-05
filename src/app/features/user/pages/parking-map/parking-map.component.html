@@ -1,7 +1,7 @@
 ﻿<div style="max-width: 1400px; margin: 0 auto; padding: 20px 16px 100px; animation: fadeIn 0.4s ease;">
 
   <h1 class="page-title">Mapa del Parqueadero</h1>
-  <p class="page-subtitle">Selecciona una zona para ver detalles y reservar</p>
+  <p class="page-subtitle">Selecciona una zona para ver detalles</p>
 
   <!-- Desktop: 2 columnas | Mobile: apilado -->
   <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
@@ -32,9 +32,34 @@
               </div>
             </div>
           </div>
-          <div style="border-radius: 12px; overflow: hidden; background: #f8fafc; max-height: 460px; display: flex; align-items: center; justify-content: center;">
+          <div style="border-radius: 12px; overflow: hidden; background: #f8fafc; max-height: 460px; display: flex; align-items: center; justify-content: center; position: relative;">
             <img src="mapa.png" alt="Mapa EAFIT"
                  style="width: 100%; height: 100%; object-fit: contain; max-height: 460px; display: block;" />
+            <!-- Heat map overlay indicators -->
+            <div style="position: absolute; top: 18%; left: 20%; width: 22%; height: 18%; background: rgba(239,68,68,0.25); border-radius: 12px; border: 2px solid rgba(239,68,68,0.4); display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 10px; font-weight: 800; color: white; background: rgba(239,68,68,0.8); padding: 2px 8px; border-radius: 6px;">ALTA</span>
+            </div>
+            <div style="position: absolute; top: 45%; left: 55%; width: 20%; height: 16%; background: rgba(245,158,11,0.25); border-radius: 12px; border: 2px solid rgba(245,158,11,0.4); display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 10px; font-weight: 800; color: white; background: rgba(245,158,11,0.8); padding: 2px 8px; border-radius: 6px;">MEDIA</span>
+            </div>
+            <div style="position: absolute; top: 65%; left: 15%; width: 18%; height: 14%; background: rgba(16,185,129,0.25); border-radius: 12px; border: 2px solid rgba(16,185,129,0.4); display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 10px; font-weight: 800; color: white; background: rgba(16,185,129,0.8); padding: 2px 8px; border-radius: 6px;">BAJA</span>
+            </div>
+          </div>
+          <!-- Heat map legend -->
+          <div style="display: flex; gap: 14px; margin-top: 10px; justify-content: center;">
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <div style="width: 16px; height: 8px; border-radius: 3px; background: rgba(239,68,68,0.5);"></div>
+              <span style="font-size: 10px; color: #6b7280;">Alta demanda</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <div style="width: 16px; height: 8px; border-radius: 3px; background: rgba(245,158,11,0.5);"></div>
+              <span style="font-size: 10px; color: #6b7280;">Media</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <div style="width: 16px; height: 8px; border-radius: 3px; background: rgba(16,185,129,0.5);"></div>
+              <span style="font-size: 10px; color: #6b7280;">Baja demanda</span>
+            </div>
           </div>
         </div>
 
@@ -96,14 +121,6 @@
                 <div class="progress-fill" [style.width.%]="(zone.availableSpots / zone.totalSpots) * 100" [style.background]="getZoneColor(zone)"></div>
               </div>
 
-              <!-- Reservar CTA -->
-              @if (selectedZone()?.id === zone.id) {
-                <button class="btn btn-primary btn-block" style="margin-top: 12px; font-size: 13px; padding: 12px;"
-                        (click)="$event.stopPropagation(); navigateToReserve(zone.id)">
-                  <span class="mi" style="font-size: 18px;">event_available</span>
-                  Reservar en {{ zone.name }}
-                </button>
-              }
             </div>
           }
         </div>

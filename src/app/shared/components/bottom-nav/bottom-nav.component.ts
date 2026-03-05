@@ -44,8 +44,8 @@ export class BottomNavComponent {
   navItems: NavItem[] = [
     { label: 'Inicio', icon: 'home', route: '/dashboard' },
     { label: 'Mapa', icon: 'map', route: '/map' },
-    { label: 'Camaras', icon: 'videocam', route: '/cameras' },
-    { label: 'Cola', icon: 'groups', route: '/queue' },
+    { label: 'Historial', icon: 'history', route: '/history' },
+    { label: 'Trafico', icon: 'traffic', route: '/queue' },
     { label: 'Perfil', icon: 'person', route: '/profile' }
   ];
 

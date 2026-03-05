@@ -28,7 +28,7 @@ export class QueueService {
   private _entranceQueues: EntranceQueue[] = [
     {
       entranceId: 'car-1', entrance: 1, vehicleType: 'car',
-      name: 'Entrada 1 — Carros', location: 'Edificio Ingenierías (Bloque 18)',
+      name: 'Entrada 1 — Las Vegas', location: 'Las Vegas',
       isOpen: true,
       queue: [
         { id: 'c1u1', userId: 'user-a', position: 1, joinedAt: new Date(Date.now() - 8 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
@@ -38,7 +38,7 @@ export class QueueService {
     },
     {
       entranceId: 'car-2', entrance: 2, vehicleType: 'car',
-      name: 'Entrada 2 — Carros', location: 'Biblioteca (Bloque 20)',
+      name: 'Entrada 2 — Las Vegas (Empleados)', location: 'Las Vegas (Empleados)',
       isOpen: true,
       queue: [
         { id: 'c2u1', userId: 'user-d', position: 1, joinedAt: new Date(Date.now() - 3 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
@@ -46,7 +46,7 @@ export class QueueService {
     },
     {
       entranceId: 'car-3', entrance: 3, vehicleType: 'car',
-      name: 'Entrada 3 — Carros', location: 'Bloque Ciencias (Bloque 32)',
+      name: 'Entrada 3 — Las Hermosas (Regional)', location: 'Las Hermosas (Regional)',
       isOpen: true,
       queue: [
         { id: 'c3u1', userId: 'user-e', position: 1, joinedAt: new Date(Date.now() - 12 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
@@ -58,13 +58,13 @@ export class QueueService {
     },
     {
       entranceId: 'car-4', entrance: 4, vehicleType: 'car',
-      name: 'Entrada 4 — Carros', location: 'Deportivo Sur (Bloque 44)',
+      name: 'Entrada 4 — La Regional', location: 'La Regional',
       isOpen: false,
       queue: []
     },
     {
       entranceId: 'car-5', entrance: 5, vehicleType: 'car',
-      name: 'Entrada 5 — Carros', location: 'Visitantes (Av. El Poblado)',
+      name: 'Entrada 5 — La Regional', location: 'La Regional',
       isOpen: true,
       queue: [
         { id: 'c5u1', userId: 'user-j', position: 1, joinedAt: new Date(Date.now() - 5 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
@@ -73,13 +73,13 @@ export class QueueService {
     },
     {
       entranceId: 'car-6', entrance: 6, vehicleType: 'car',
-      name: 'Entrada 6 — Carros', location: 'Posgrados (Bloque 38)',
+      name: 'Entrada 6 — Idiomas', location: 'Idiomas',
       isOpen: true,
       queue: []
     },
     {
       entranceId: 'moto-1', entrance: 1, vehicleType: 'motorcycle',
-      name: 'Entrada 1 — Motos', location: 'Costado Ingenierías',
+      name: 'Entrada 1 — Las Vegas', location: 'Las Vegas',
       isOpen: true,
       queue: [
         { id: 'm1u1', userId: 'user-l', position: 1, joinedAt: new Date(Date.now() - 4 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
@@ -88,7 +88,7 @@ export class QueueService {
     },
     {
       entranceId: 'moto-2', entrance: 2, vehicleType: 'motorcycle',
-      name: 'Entrada 2 — Motos', location: 'Costado Biblioteca',
+      name: 'Entrada 2 — La Regional', location: 'La Regional',
       isOpen: true,
       queue: [
         { id: 'm2u1', userId: 'user-n', position: 1, joinedAt: new Date(Date.now() - 7 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
@@ -98,7 +98,7 @@ export class QueueService {
     },
     {
       entranceId: 'moto-3', entrance: 3, vehicleType: 'motorcycle',
-      name: 'Entrada 3 — Motos', location: 'Deportivo Sur',
+      name: 'Entrada 3 — Idiomas', location: 'Idiomas',
       isOpen: true,
       queue: []
     },
