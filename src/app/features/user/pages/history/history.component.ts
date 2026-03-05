@@ -1,7 +1,8 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LABELS } from '@shared/constants/labels.constants';
 import { ParkingSession } from '@domain/entities/parking-session.entity';
+import { ParkingService } from '@application/services/parking.service';
 
 @Component({
   standalone: true,
@@ -11,10 +12,12 @@ import { ParkingSession } from '@domain/entities/parking-session.entity';
   styleUrl: './history.component.scss'
 })
 export class HistoryComponent implements OnInit {
+  private parkingService = inject(ParkingService);
   readonly labels = LABELS;
 
   // Signals
   sessions = signal<ParkingSession[]>([]);
+  zones = this.parkingService.zones;
   isLoading = signal(false);
   selectedFilter = signal<'all' | 'week' | 'month'>('all');
 
@@ -76,11 +79,12 @@ export class HistoryComponent implements OnInit {
 
   private generateMockSessions(): ParkingSession[] {
     const sessions: ParkingSession[] = [];
-    const zones = ['zone-a', 'zone-b', 'zone-c'];
+    const parkingZones = this.parkingService.zones();
+    const zoneIds = parkingZones.map(z => z.id);
     const now = new Date();
 
-    // Generar 15 sesiones de los últimos 2 meses
-    for (let i = 0; i < 15; i++) {
+    // Generar 20 sesiones de los últimos 2 meses
+    for (let i = 0; i < 20; i++) {
       const daysAgo = Math.floor(Math.random() * 60);
       const entryTime = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
       const duration = 60 + Math.floor(Math.random() * 240); // 1-5 horas
@@ -89,8 +93,8 @@ export class HistoryComponent implements OnInit {
       sessions.push({
         id: `session-${i}`,
         userId: 'user-demo-123',
-        spotId: `spot-${Math.floor(Math.random() * 50)}`,
-        zoneId: zones[Math.floor(Math.random() * zones.length)],
+        spotId: `spot-${Math.floor(Math.random() * 100)}`,
+        zoneId: zoneIds[Math.floor(Math.random() * zoneIds.length)],
         entryTime,
         exitTime,
         durationMinutes: duration
@@ -105,12 +109,13 @@ export class HistoryComponent implements OnInit {
   }
 
   getZoneName(zoneId: string): string {
-    const zoneMap: Record<string, string> = {
-      'zone-a': 'Zona A',
-      'zone-b': 'Zona B',
-      'zone-c': 'Zona C'
-    };
-    return zoneMap[zoneId] || zoneId;
+    const zone = this.parkingService.zones().find(z => z.id === zoneId);
+    return zone?.name || zoneId;
+  }
+
+  getZoneType(zoneId: string): 'car' | 'motorcycle' | null {
+    const zone = this.parkingService.zones().find(z => z.id === zoneId);
+    return zone?.vehicleType || null;
   }
 
   formatDuration(minutes: number): string {

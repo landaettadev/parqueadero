@@ -1,163 +1,150 @@
-<div class="container mx-auto px-4 py-8 max-w-6xl">
-  <!-- Header -->
-  <div class="mb-8">
-    <h1 class="text-4xl font-bold text-eafit-primary mb-2">
-      {{ labels.HISTORY }}
-    </h1>
-    <p class="text-gray-600">Tu historial de uso del parqueadero</p>
-  </div>
+﻿<div class="page">
+  <h1 class="page-title">Historial</h1>
+  <p class="page-subtitle">Tu historial de uso del parqueadero EAFIT</p>
 
   @if (isLoading()) {
-    <div class="flex justify-center items-center py-20">
-      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-eafit-primary"></div>
+    <div style="display: flex; justify-content: center; padding: 60px 0;">
+      <div style="width: 48px; height: 48px; border: 4px solid #e5e7eb; border-top-color: #000066; border-radius: 50%; animation: spin 1s linear infinite;"></div>
     </div>
   } @else {
-    <!-- Stats Summary -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex items-center gap-4">
-          <div class="bg-blue-100 rounded-full p-4">
-            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600">Total Visitas</p>
-            <p class="text-3xl font-bold text-gray-800">{{ totalVisits() }}</p>
-          </div>
+
+    <!-- Stats Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px;">
+      <div class="card" style="text-align: center; padding: 20px 16px;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(59,130,246,0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+          <span class="mi" style="font-size: 24px; color: #3b82f6;">event_note</span>
         </div>
+        <div style="font-size: 26px; font-weight: 900; color: #1a1a2e; margin-bottom: 4px;">{{ totalVisits() }}</div>
+        <div style="font-size: 12px; color: #9ca3af;">Total Visitas</div>
       </div>
 
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex items-center gap-4">
-          <div class="bg-green-100 rounded-full p-4">
-            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600">Promedio Estancia</p>
-            <p class="text-3xl font-bold text-gray-800">{{ averageDuration() }}m</p>
-          </div>
+      <div class="card" style="text-align: center; padding: 20px 16px;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16,185,129,0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+          <span class="mi" style="font-size: 24px; color: #10b981;">schedule</span>
         </div>
+        <div style="font-size: 26px; font-weight: 900; color: #1a1a2e; margin-bottom: 4px;">{{ averageDuration() }}m</div>
+        <div style="font-size: 12px; color: #9ca3af;">Promedio Estancia</div>
       </div>
 
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="flex items-center gap-4">
-          <div class="bg-purple-100 rounded-full p-4">
-            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            </svg>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600">Zona Favorita</p>
-            <p class="text-3xl font-bold text-gray-800">{{ favoriteZone() }}</p>
-          </div>
+      <div class="card" style="text-align: center; padding: 20px 16px;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(139,92,246,0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+          <span class="mi" style="font-size: 24px; color: #8b5cf6;">location_on</span>
         </div>
+        <div style="font-size: 13px; font-weight: 900; color: #1a1a2e; margin-bottom: 4px; line-height: 1.3;">{{ favoriteZone() }}</div>
+        <div style="font-size: 12px; color: #9ca3af;">Zona Favorita</div>
       </div>
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-lg shadow-md p-4 mb-6">
-      <div class="flex items-center gap-4">
-        <span class="text-sm font-semibold text-gray-700">Filtrar por:</span>
-        <div class="flex gap-2">
-          <button 
-            (click)="setFilter('all')"
-            [class.bg-eafit-primary]="selectedFilter() === 'all'"
-            [class.text-white]="selectedFilter() === 'all'"
-            [class.bg-gray-100]="selectedFilter() !== 'all'"
-            [class.text-gray-700]="selectedFilter() !== 'all'"
-            class="px-4 py-2 rounded-lg font-medium transition-colors">
-            Todos
-          </button>
-          <button 
-            (click)="setFilter('week')"
-            [class.bg-eafit-primary]="selectedFilter() === 'week'"
-            [class.text-white]="selectedFilter() === 'week'"
-            [class.bg-gray-100]="selectedFilter() !== 'week'"
-            [class.text-gray-700]="selectedFilter() !== 'week'"
-            class="px-4 py-2 rounded-lg font-medium transition-colors">
-            Última Semana
-          </button>
-          <button 
-            (click)="setFilter('month')"
-            [class.bg-eafit-primary]="selectedFilter() === 'month'"
-            [class.text-white]="selectedFilter() === 'month'"
-            [class.bg-gray-100]="selectedFilter() !== 'month'"
-            [class.text-gray-700]="selectedFilter() !== 'month'"
-            class="px-4 py-2 rounded-lg font-medium transition-colors">
-            Último Mes
-          </button>
+    <div class="card" style="padding: 14px 18px; margin-bottom: 16px;">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <span style="font-size: 13px; font-weight: 600; color: #6b7280;">Filtrar:</span>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          @for (f of [{v:'all',l:'Todos'},{v:'week',l:'Semana'},{v:'month',l:'Mes'}]; track f.v) {
+            <button (click)="setFilter($any(f.v))"
+                    style="padding: 6px 14px; border-radius: 20px; border: 1.5px solid; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; transition: all 0.2s;"
+                    [style.borderColor]="selectedFilter() === f.v ? '#000066' : '#e5e7eb'"
+                    [style.background]="selectedFilter() === f.v ? 'rgba(0,0,102,0.08)' : 'white'"
+                    [style.color]="selectedFilter() === f.v ? '#000066' : '#6b7280'">{{ f.l }}</button>
+          }
         </div>
       </div>
     </div>
 
-    <!-- History Table -->
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      @if (filteredSessions().length === 0) {
-        <div class="p-12 text-center">
-          <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <p class="text-gray-600">No hay registros para mostrar</p>
-        </div>
-      } @else {
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Fecha</th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Zona</th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Entrada</th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Salida</th>
-                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Duración</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-              @for (session of filteredSessions(); track session.id) {
-                <tr class="hover:bg-gray-50 transition-colors">
-                  <td class="px-6 py-4">
-                    <div class="text-sm font-medium text-gray-800">
-                      {{ session.entryTime | date:'mediumDate' }}
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                      {{ getZoneName(session.zoneId) }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="text-sm text-gray-600">
-                      {{ session.entryTime | date:'shortTime' }}
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="text-sm text-gray-600">
-                      {{ session.exitTime ? (session.exitTime | date:'shortTime') : '-' }}
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="text-sm font-medium text-gray-800">
-                      {{ session.durationMinutes ? formatDuration(session.durationMinutes) : '-' }}
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
+    <!-- Parking Zones List -->
+    <div style="margin-bottom: 20px;">
+      <h2 style="font-size: 16px; font-weight: 700; color: #1a1a2e; margin: 0 0 12px;">Zonas de Parqueadero</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px;">
+        @for (zone of zones(); track zone.id) {
+          <div class="card" style="padding: 14px 16px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                   [style.background]="zone.vehicleType === 'car' ? 'rgba(0,0,102,0.08)' : 'rgba(139,92,246,0.1)'">
+                <span class="mi" style="font-size: 20px;"
+                      [style.color]="zone.vehicleType === 'car' ? '#000066' : '#8b5cf6'">
+                  {{ zone.vehicleType === 'car' ? 'directions_car' : 'two_wheeler' }}
+                </span>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; font-weight: 700; color: #1a1a2e;">{{ zone.name }}</div>
+                <div style="font-size: 11px; color: #9ca3af; margin-top: 1px;">{{ zone.description }}</div>
+              </div>
+              <div style="text-align: right; flex-shrink: 0;">
+                <div style="font-size: 16px; font-weight: 800;" [style.color]="zone.status === 'full' ? '#ef4444' : zone.status === 'limited' ? '#f59e0b' : '#10b981'">
+                  {{ zone.availableSpots }}
+                </div>
+                <div style="font-size: 10px; color: #9ca3af;">libres</div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
     </div>
 
-    <!-- Export Button -->
-    <div class="mt-6 flex justify-end">
-      <button class="flex items-center gap-2 bg-eafit-primary hover:bg-eafit-primary/90 text-white font-semibold px-6 py-3 rounded-lg transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        Exportar Historial
-      </button>
-    </div>
+    <!-- History Sessions -->
+    <h2 style="font-size: 16px; font-weight: 700; color: #1a1a2e; margin: 0 0 12px;">Sesiones Recientes</h2>
+    
+    @if (filteredSessions().length === 0) {
+      <div class="card" style="padding: 60px 20px; text-align: center;">
+        <span class="mi" style="font-size: 64px; color: #e5e7eb;">history</span>
+        <p style="font-size: 14px; color: #9ca3af; margin-top: 12px;">No hay registros para mostrar</p>
+      </div>
+    } @else {
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        @for (session of filteredSessions(); track session.id) {
+          <div class="card" style="padding: 16px 18px;">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+              <!-- Icon -->
+              <div style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                   [style.background]="getZoneType(session.zoneId) === 'car' ? 'rgba(0,0,102,0.08)' : 'rgba(139,92,246,0.1)'">
+                <span class="mi" style="font-size: 22px;"
+                      [style.color]="getZoneType(session.zoneId) === 'car' ? '#000066' : '#8b5cf6'">
+                  {{ getZoneType(session.zoneId) === 'car' ? 'directions_car' : 'two_wheeler' }}
+                </span>
+              </div>
+
+              <!-- Info -->
+              <div style="flex: 1; min-width: 200px;">
+                <div style="font-size: 14px; font-weight: 700; color: #1a1a2e;">{{ getZoneName(session.zoneId) }}</div>
+                <div style="font-size: 12px; color: #9ca3af; margin-top: 2px;">
+                  <span class="mi" style="font-size: 14px; vertical-align: middle;">calendar_today</span>
+                  {{ session.entryTime | date:'mediumDate' }}
+                </div>
+              </div>
+
+              <!-- Time Details -->
+              <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <div style="text-align: center;">
+                  <div style="font-size: 11px; color: #9ca3af; margin-bottom: 2px;">Entrada</div>
+                  <div style="font-size: 13px; font-weight: 700; color: #1a1a2e;">{{ session.entryTime | date:'shortTime' }}</div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 11px; color: #9ca3af; margin-bottom: 2px;">Salida</div>
+                  <div style="font-size: 13px; font-weight: 700; color: #1a1a2e;">{{ session.exitTime ? (session.exitTime | date:'shortTime') : '-' }}</div>
+                </div>
+                <div style="text-align: center;">
+                  <div style="font-size: 11px; color: #9ca3af; margin-bottom: 2px;">Duracion</div>
+                  <div style="font-size: 13px; font-weight: 700; color: #000066;">{{ session.durationMinutes ? formatDuration(session.durationMinutes) : '-' }}</div>
+                </div>
+              </div>
+
+              <!-- Spot -->
+              <div style="padding: 6px 12px; border-radius: 8px; background: #f8fafc; flex-shrink: 0;">
+                <div style="font-size: 10px; color: #9ca3af;">Celda</div>
+                <div style="font-size: 13px; font-weight: 800; color: #1a1a2e;">{{ session.spotId }}</div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Export Button -->
+      <div style="margin-top: 20px; display: flex; justify-content: center;">
+        <button style="display: flex; align-items: center; gap: 8px; padding: 14px 24px; border-radius: 14px; border: none; background: #000066; color: white; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;">
+          <span class="mi" style="font-size: 20px;">download</span>
+          Exportar Historial
+        </button>
+      </div>
+    }
   }
 </div>
