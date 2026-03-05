@@ -21,8 +21,8 @@ export class ProfileComponent {
   newType = signal<'car' | 'motorcycle' | 'bicycle' | 'electric'>('car');
 
   user = {
-    name: 'Ernesto Garnica',
-    email: 'ernesto.garnica@eafit.edu.co',
+    name: 'John Doe',
+    email: 'john.doe@eafit.edu.co',
     role: 'Estudiante',
     carnet: '202510001',
     since: 'Enero 2025'

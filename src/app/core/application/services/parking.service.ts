@@ -12,8 +12,8 @@ export class ParkingService {
     {
       id: 'car-1', name: 'Entrada 1 — Las Vegas', entrance: 1,
       description: 'Entrada 1 · Las Vegas',
-      vehicleType: 'car', totalSpots: 100, occupiedSpots: 80, availableSpots: 20,
-      status: 'available', location: { lat: 6.2006, lng: -75.5783 }
+      vehicleType: 'car', totalSpots: 100, occupiedSpots: 100, availableSpots: 0,
+      status: 'full', location: { lat: 6.2006, lng: -75.5783 }
     },
     {
       id: 'car-2', name: 'Entrada 2 — Las Vegas (Empleados)', entrance: 2,
@@ -28,14 +28,14 @@ export class ParkingService {
       status: 'limited', location: { lat: 6.1998, lng: -75.5775 }
     },
     {
-      id: 'car-4', name: 'Entrada 4 — La Regional', entrance: 4,
-      description: 'Entrada 4 · La Regional',
+      id: 'car-4', name: 'Entrada 4 — Aguacatala', entrance: 4,
+      description: 'Entrada 4 · Aguacatala',
       vehicleType: 'car', totalSpots: 100, occupiedSpots: 100, availableSpots: 0,
       status: 'full', location: { lat: 6.1995, lng: -75.5770 }
     },
     {
-      id: 'car-5', name: 'Entrada 5 — La Regional', entrance: 5,
-      description: 'Entrada 5 · La Regional',
+      id: 'car-5', name: 'Entrada 5 — 4 Sur', entrance: 5,
+      description: 'Entrada 5 · 4 Sur',
       vehicleType: 'car', totalSpots: 100, occupiedSpots: 72, availableSpots: 28,
       status: 'available', location: { lat: 6.2014, lng: -75.5786 }
     },
@@ -49,8 +49,8 @@ export class ParkingService {
     {
       id: 'moto-1', name: 'Entrada 1 — Las Vegas', entrance: 1,
       description: 'Entrada 1 · Las Vegas',
-      vehicleType: 'motorcycle', totalSpots: 80, occupiedSpots: 54, availableSpots: 26,
-      status: 'available', location: { lat: 6.2007, lng: -75.5782 }
+      vehicleType: 'motorcycle', totalSpots: 80, occupiedSpots: 78, availableSpots: 2,
+      status: 'limited', location: { lat: 6.2007, lng: -75.5782 }
     },
     {
       id: 'moto-2', name: 'Entrada 2 — La Regional', entrance: 2,

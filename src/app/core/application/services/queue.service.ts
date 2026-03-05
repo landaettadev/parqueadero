@@ -58,13 +58,13 @@ export class QueueService {
     },
     {
       entranceId: 'car-4', entrance: 4, vehicleType: 'car',
-      name: 'Entrada 4 — La Regional', location: 'La Regional',
+      name: 'Entrada 4 — Aguacatala', location: 'Aguacatala',
       isOpen: false,
       queue: []
     },
     {
       entranceId: 'car-5', entrance: 5, vehicleType: 'car',
-      name: 'Entrada 5 — La Regional', location: 'La Regional',
+      name: 'Entrada 5 — 4 Sur', location: '4 Sur',
       isOpen: true,
       queue: [
         { id: 'c5u1', userId: 'user-j', position: 1, joinedAt: new Date(Date.now() - 5 * 60000), estimatedWaitMinutes: 5, status: 'WAITING' },
