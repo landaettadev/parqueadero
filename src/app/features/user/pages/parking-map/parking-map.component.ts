@@ -20,6 +20,8 @@ export class ParkingMapComponent implements OnInit {
   readonly Math = Math;
   
   zones = this.parkingService.zones;
+  carZones = this.parkingService.carZones;
+  motoZones = this.parkingService.motoZones;
   selectedZone = signal<ParkingZone | null>(null);
   isLoading = this.parkingService.isLoading;
 
